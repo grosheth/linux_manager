@@ -12,12 +12,19 @@ LIGHT_GREEN='\033[0;32m'  # Light Green
 
 
 automatic_git () {
-  echo -e "${YELLOW} --- Push changes to git repo --- ${GREEN} "
-  if [ -n $1 ]; then
-    git add . && git commit -m "$1" && git push
-  else
-    git add . && git commit -m "Automatic commit via mgr command" && git push
-  fi
+  {
+      COMMAND=$("git add . && git commit -m "Automatic commit via mgr command" && git push")
+  }
+  CMD_RETURN_CODE=$?
+
+  echo -e "${YELLOW} --- Push changes to git repo ---"
+    if [ $CMD_RETURN_CODE != 0 ]; then
+        echo -e "${RED}"
+        git add . && git commit -m "Automatic commit via mgr command" && git push
+    else
+      echo -e "${GREEN}"
+      git add . && git commit -m "$1" && git push
+    fi
 
 }
 
@@ -25,7 +32,7 @@ usage="$(basename "$0") [-h] [-g] -- script that automates stuff
 
 where:
     -h  show this help text
-    -g  add,commit, and push to Git in the current repo. Commit message can be passed like this: mgr -g 'commit message'"
+    -g  [mgr -g 'commit message'] Will add,commit, and push to Git in the current directory."
 
 while getopts ':hg:' option; do
   case "$option" in
