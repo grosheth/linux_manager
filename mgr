@@ -23,7 +23,7 @@ automatic_git () {
         echo -e "${RED}"
         git add . && git commit -m "Automatic commit via mgr command" && git push
     else
-      echo -e "${GREEN}"
+      echo -e "${GREEN} Success ${WHITE}"
       git add . && git commit -m "$1" && git push
     fi
 }
