@@ -20,7 +20,7 @@ automatic_git () {
 
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
-        echo -e "${RED}"
+        echo -e "${RED}Failed"
         git add . && git commit -m "Automatic commit via mgr command" && git push
     else
       echo -e "${GREEN}Success ${WHITE}"
