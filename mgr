@@ -11,10 +11,13 @@ WHITE='\033[1;37m'        # White
 LIGHT_GREEN='\033[0;32m'  # Light Green
 
 
-git () {
+automatic_git () {
+  echo -e "${YELLOW} --- Push changes to git repo ---"
   if [ -n $1 ]; then
+    echo $0 $1 $2 $3
     git add . && git commit -m "$1" && git push
   else
+    echo $0 $1 $2 $3
     git add . && git commit -m "Automatic commit via mgr command" && git push
   fi
 
@@ -26,24 +29,21 @@ where:
     -h  show this help text
     -g  add,commit, and push to Git in the current repo. Commit message can be passed like this: mgr -g 'commit message'"
 
-while getopts ':hs:' option; do
+while getopts ':hg:' option; do
   case "$option" in
     h) echo "$usage"
        exit
        ;;
-    :) printf "missing argument for -%s\n" "$OPTARG" >&2
+    :) echo "missing argument for -%s\n" "$OPTARG" >&2
        echo "$usage" >&2
        exit 1
        ;;
-    g) git ()
-        exit
-        ;;
-   \?) printf "illegal option: -%s\n" "$OPTARG" >&2
+    g) automatic_git $1
+       ;;
+   \?) echo "illegal option: -%s\n" "$OPTARG" >&2
        echo "$usage" >&2
        exit 1
        ;;
   esac
 done
-
-shift $((OPTIND - 1))
 
