@@ -25,7 +25,7 @@ automatic_git () {
       echo -e "${GREEN}"
       git add . && git commit -m "$1" && git push
     fi
-
+  echo -e "${WHITE}"
 }
 
 usage="$(basename "$0") [-h] [-g] -- script that automates stuff
