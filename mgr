@@ -16,7 +16,8 @@ automatic_git () {
       COMMAND=$("git add . && git commit -m "Automatic commit via mgr command" && git push")
   }
   CMD_RETURN_CODE=$?
-
+  echo $CMD_RETURN_CODE
+  
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}"
