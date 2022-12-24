@@ -12,12 +12,10 @@ LIGHT_GREEN='\033[0;32m'  # Light Green
 
 
 automatic_git () {
-  echo -e "${YELLOW} --- Push changes to git repo ---"
+  echo -e "${YELLOW} --- Push changes to git repo --- ${GREEN} "
   if [ -n $1 ]; then
-    echo $0 $1 $2 $3
     git add . && git commit -m "$1" && git push
   else
-    echo $0 $1 $2 $3
     git add . && git commit -m "Automatic commit via mgr command" && git push
   fi
 
@@ -38,7 +36,7 @@ while getopts ':hg:' option; do
        echo "$usage" >&2
        exit 1
        ;;
-    g) automatic_git $1
+    g) automatic_git $2
        ;;
    \?) echo "illegal option: -%s\n" "$OPTARG" >&2
        echo "$usage" >&2
