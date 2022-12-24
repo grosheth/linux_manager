@@ -13,7 +13,7 @@ LIGHT_GREEN='\033[0;32m'  # Light Green
 
 automatic_git () {
   {
-      COMMAND=$(git add . && git commit -m "Automatic commit via mgr command" && git push)
+      COMMAND=$(git add .)
   }
   CMD_RETURN_CODE=$?
   echo $CMD_RETURN_CODE
