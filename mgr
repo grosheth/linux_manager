@@ -11,12 +11,15 @@ WHITE='\033[1;37m'        # White
 LIGHT_GREEN='\033[0;32m'  # Light Green
 
 
-git () 
-{
-  if [ $1 ]
-  git add . && git commit -m "$1" && git push
+git () {
+  if [ -n $1 ]; then
+    git add . && git commit -m "$1" && git push
+  else
+    git add . && git commit -m "Automatic commit via mgr command" && git push
+  fi
 
 }
+
 usage="$(basename "$0") [-h] [-g] -- script that automates stuff
 
 where:
