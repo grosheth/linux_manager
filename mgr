@@ -28,31 +28,51 @@ automatic_git () {
 }
 
 backup_files () { 
-  echo -e "${YELLOW} --- Creating Backups ---${CYAN}"
-  [ -d $1 ] || mkdir $1
-  [ -d ~/.ssh ] || cp -R ~/.ssh $1
-  [ -d ~/.zshrc ] || cp ~/.zshrc $1
-  [ -d ~/.bashrc ] || cp ~/.bashrc $1
+  echo -e "${YELLOW} --- Creating Backups ---${WHITE}"
+  ( [ -d $1 ] || mkdir $1 )
+  ( [ -d ~/.ssh ] || cp -R ~/.ssh $1 )
+  ( [ -d ~/.zshrc ] || cp ~/.zshrc $1 )
+  ( [ -d ~/.bashrc ] || cp ~/.bashrc $1 )
   echo -e "${GREEN} --- Success ---"
 }
 
-usage="$(basename "$0") [-h] [-g] -- script that automates stuff
+usage="
+$(basename "$0") [-h] [-g] [-b] -- script that automates stuff
 
 Options:
-    -h, --help  show this help text
-    -g, --git  [mgr -g 'commit message'] Git add,commit, and push to Git in the current directory.
-    -b, --backup  [mgr -b /full/path/to/backup/]  Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc"
+    -h        show this help text
+    -g        [mgr -g 'commit message'] Git add,commit, and push to Git in the current directory.
+    -b        [mgr -b /full/path/to/backup/]  Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc"
+
+usage_git="$(basename "$0") [-g] -- Git add, commit & push
+
+ Syntax example: [mgr -g 'commit message']
     
+ This will do the equivalent of: git add, commit, and push to Git in the current directory."
+
+usage_backup="$(basename "$0") [-h] -- script that automates stuff
+
+ Syntax example: [mgr -b /full/path/to/backup/]
+    
+ This will create the backup repository, then create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc"
+
 while getopts ':-hbg:' option; do
   case "$option" in
-    h) echo "$usage"
+    h) echo "${WHITE} $usage"
        exit
        ;;
-    :) echo "missing argument for -%s\n" "$OPTARG" >&2
-       echo "$usage" >&2
+    :) echo "missing argument for" "$OPTARG" >&2
+        if [ $OPTARG == 'b' ]; then
+          echo -e  "${WHITE} $usage_backup"
+        elif [ $OPTARG == 'g' ]; then
+          echo -e "${WHITE} $usage_git"
+        fi
        exit 1
        ;;
     g) automatic_git $2
+       if [ -n $2 ]; then
+          echo $usage_git
+       fi
        ;;
     b) backup_files $2
        ;;
