@@ -54,7 +54,7 @@ usage_network="
 
 automatic_git () {
   {
-      COMMAND=$(git checkout -b "verif_branch" && git add . && git commit -m "$1" && git push)
+      COMMAND=$(git checkout -b "verif_branch" && git add . && git commit -m "$1" && git push && git checkout main && git branch --delete verif_branch)
   }
   CMD_RETURN_CODE=$?
 
@@ -64,7 +64,7 @@ automatic_git () {
         echo $COMMAND
     else
       echo -e "${LIGHT_GREEN}Success ${WHITE}"
-      git add . && git commit -m "$1" && git push
+      git add . && git commit -m "$1" && git push --set-upstream origin verif_branch
     fi
 }
 
