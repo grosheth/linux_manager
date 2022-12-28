@@ -54,7 +54,7 @@ usage_network="
 
 automatic_git () {
   {
-      COMMAND=$(git add . && git commit -m "$1")
+      COMMAND=$(git checkout -b "verif_branch" && git add . && git commit -m "$1" && git push)
   }
   CMD_RETURN_CODE=$?
 
