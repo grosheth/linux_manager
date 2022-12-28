@@ -16,7 +16,6 @@ automatic_git () {
       COMMAND=$(git add .)
   }
   CMD_RETURN_CODE=$?
-  echo $CMD_RETURN_CODE
 
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
@@ -28,13 +27,23 @@ automatic_git () {
     fi
 }
 
+backup_files () { 
+  echo -e "${YELLOW} --- Creating Backups ---${CYAN}"
+  [ -d $1 ] || mkdir $1
+  [ -d ~/.ssh ] || cp -R ~/.ssh $1
+  [ -d ~/.zshrc ] || cp ~/.zshrc $1
+  [ -d ~/.bashrc ] || cp ~/.bashrc $1
+  echo -e "${GREEN} --- Success ---"
+}
+
 usage="$(basename "$0") [-h] [-g] -- script that automates stuff
 
-where:
-    -h  show this help text
-    -g  [mgr -g 'commit message'] Will add,commit, and push to Git in the current directory."
-
-while getopts ':hg:' option; do
+Options:
+    -h, --help  show this help text
+    -g, --git  [mgr -g 'commit message'] Git add,commit, and push to Git in the current directory.
+    -b, --backup  [mgr -b /full/path/to/backup/]  Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc"
+    
+while getopts ':-hbg:' option; do
   case "$option" in
     h) echo "$usage"
        exit
@@ -45,10 +54,13 @@ while getopts ':hg:' option; do
        ;;
     g) automatic_git $2
        ;;
-   \?) echo "illegal option: -%s\n" "$OPTARG" >&2
+    b) backup_files $2
+       ;;
+   \?) echo "illegal option:" "$OPTARG" >&2
        echo "$usage" >&2
        exit 1
        ;;
   esac
 done
 
+shift "$(($OPTIND -1))"
