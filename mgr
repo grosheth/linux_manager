@@ -37,6 +37,12 @@ backup_files () {
   echo -e "${GREEN} --- Success ---"
 }
 
+default_apps () {
+  sudo update-alternatives --config x-www-browser
+  
+
+}
+
 usage="
   $(basename "$0") [-h] [-g] [-b] -- script that automates stuff
 
