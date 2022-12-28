@@ -37,16 +37,13 @@ backup_files () {
   echo -e "${GREEN} --- Success ---"
 }
 
-default_apps () {
-  sudo update-alternatives --config x-www-browser
-  
 
-}
+form_top="
+  linux_manager -- $(basename "$0") -- Automates stuff on Linux
+
+"
 
 usage="
-  $(basename "$0") [-h] [-g] [-b] -- script that automates stuff
-
-
   Options:      Syntax:                             Description:
 
       -h        [mgr -h]                            show this help text
@@ -56,9 +53,6 @@ usage="
 "
 
 usage_git="
-  $(basename "$0") [-g] -- Git add, commit & push
-
-
   Options:      Syntax:                             Description:
   
       -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
@@ -67,9 +61,6 @@ usage_git="
 "
 
 usage_backup="
-  $(basename "$0") [-b] -- Command that create automatic backup in specified folder
-
-
   Options:      Syntax:                             Description:
   
       -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
@@ -79,25 +70,25 @@ usage_backup="
 
 while getopts ':-hbg' option; do
   case "$option" in
-    h) echo "$usage"
+    h) echo "$form_top $usage"
        exit
        ;;
     g)
       if [ -z $2 ]; then
-        echo "$usage_git"
+        echo "$form_top $usage_git"
       else
         automatic_git $2
       fi
       ;;
     b)
       if [ -z $2 ]; then
-        echo "$usage_backup"
+        echo "$form_top $usage_backup"
       else
         backup_files $2
       fi
       ;;
    \?) echo "illegal option:" "$OPTARG" >&2
-       echo "$usage" >&2
+       echo "$form_top $usage" >&2
        exit 1
        ;;
   esac
