@@ -51,7 +51,6 @@ usage_network="
 
 "
 
-
 automatic_git () {
   {
       COMMAND=$(git add .)
@@ -61,7 +60,7 @@ automatic_git () {
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}Failed"
-        echo $COMMAND
+        git add .
     else
       echo -e "${LIGHT_GREEN}Success ${WHITE}"
       git add . && git commit -m "$1" && git push --set-upstream origin verif_branch
@@ -151,3 +150,4 @@ while getopts ':-hbgn' option; do
 done
 
 shift "$(($OPTIND -1))"
+
