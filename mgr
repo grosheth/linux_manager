@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Colors
-BLACK='\033[1;30m'        # Black
-RED='\033[1;31m'          # Red
-GREEN='\033[1;32m'        # Green
-YELLOW='\033[1;33m'       # Yellow
-BLUE='\033[1;34m'         # Blue
-CYAN='\033[1;36m'         # Cyan
-WHITE='\033[1;37m'        # White
-LIGHT_GREEN='\033[0;32m'  # Light Green
+BLACK='\033[1;30m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+CYAN='\033[1;33m'
+BLUE='\033[1;34m'
+YELLOW='\033[1;36m'
+WHITE='\033[1;37m'
+LIGHT_GREEN='\033[0;32m'
 
 
 automatic_git () {
@@ -34,7 +34,24 @@ backup_files () {
   cp -R ~/.ssh $1
   cp ~/.zshrc $1
   cp ~/.bashrc $1
-  echo -e "${GREEN} --- Success ---"
+  echo -e "${LIGHT_GREEN} --- Success ---"
+}
+
+setup_dns () {
+  echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
+  echo "Your actual DNS:  "
+  grep "nameserver" /etc/resolv.conf
+  read -n 1 -p "Do you want to add a new DNS or modify one?:" dns_change 
+
+}
+
+setup_ip () {
+  echo -e "${YELLOW} --- Change your IP Address --- ${WHITE}"
+  echo "Here are your Network cards:  "
+  ip a
+  read  -n 1 -p "Which Network card do you want to modify?:" network_card
+
+
 }
 
 
@@ -46,9 +63,10 @@ form_top="
 usage="
   Options:      Syntax:                             Description:
 
-      -h        [mgr -h]                            show this help text
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
       -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+      -h        [mgr -h]                            show this help text
+      -n        [mgr -n dns]                            Change your DNS, Static IP address, VPN. (NetworkManager)
 
 "
 
@@ -67,12 +85,28 @@ usage_backup="
 
 
 "
+usage_network="
+  Options:      Syntax:                             Description:
+  
+      -n        [mgr -n]                            Shows this message
+      ip        [mgr -n ip]                         Change your Static IP address
+      dns       [mgr -n dns]                        Change your DNS
 
-while getopts ':-hbg' option; do
+
+"
+
+while getopts ':-hbgn' option; do
   case "$option" in
     h) echo "$form_top $usage"
        exit
        ;;
+    b)
+      if [ -z $2 ]; then
+        echo "$form_top $usage_backup"
+      else
+        backup_files $2
+      fi
+      ;;
     g)
       if [ -z $2 ]; then
         echo "$form_top $usage_git"
@@ -80,11 +114,18 @@ while getopts ':-hbg' option; do
         automatic_git $2
       fi
       ;;
-    b)
+    n)
       if [ -z $2 ]; then
-        echo "$form_top $usage_backup"
+        echo "$form_top $usage_network"
       else
-        backup_files $2
+        case $2 in
+          dns)
+            setup_dns
+            ;;
+          ip)
+            setup_ip
+            ;;
+        esac
       fi
       ;;
    \?) echo "illegal option:" "$OPTARG" >&2

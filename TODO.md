@@ -4,4 +4,5 @@
 - VM stuff
 - Tests automation?
 
-- Network settings (DNS, VPN, )
+- Network settings ( DNS, IP address )
+- Enable VPN ( openvpn, maybe others )
