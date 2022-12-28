@@ -56,13 +56,12 @@ automatic_git () {
   {
       COMMAND=$(git add . && git commit -m "$1")
   }
-  echo $COMMAND
   CMD_RETURN_CODE=$?
 
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}Failed"
-        git add . && git commit -m "Erreur lors du push" && git push # This will show the output of the error
+        echo $COMMAND
     else
       echo -e "${LIGHT_GREEN}Success ${WHITE}"
       git add . && git commit -m "$1" && git push
