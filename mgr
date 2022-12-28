@@ -52,18 +52,22 @@ usage="
 usage_git="
   $(basename "$0") [-g] -- Git add, commit & push
 
-  Syntax example: [mgr -g 'commit message']
-      
-  This will do the equivalent of: git add, commit, and push to Git in the current directory.
+
+  Options:      Syntax:                             Description:
+  
+      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+
 
 "
 
 usage_backup="
   $(basename "$0") [-b] -- Command that create automatic backup in specified folder
 
-  Syntax example: [mgr -b /full/path/to/backup/]
-      
-  This will create the backup repository, then create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+
+  Options:      Syntax:                             Description:
+  
+      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+
 
 "
 
