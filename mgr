@@ -11,6 +11,47 @@ WHITE='\033[1;37m'
 LIGHT_GREEN='\033[0;32m'
 
 
+form_top="
+  linux_manager -- $(basename "$0") -- Automates stuff on Linux
+
+"
+
+usage="
+  Options:      Syntax:                             Description:
+
+      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+      -h        [mgr -h]                            show this help text
+      -n        [mgr -n dns]                            Change your DNS, Static IP address, VPN. (NetworkManager)
+
+"
+
+usage_git="
+  Options:      Syntax:                             Description:
+  
+      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+
+
+"
+
+usage_backup="
+  Options:      Syntax:                             Description:
+  
+      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+
+
+"
+usage_network="
+  Options:      Syntax:                             Description:
+  
+      -n        [mgr -n]                            Shows this message
+      ip        [mgr -n ip]                         Change your Static IP address
+      dns       [mgr -n dns]                        Change your DNS
+
+
+"
+
+
 automatic_git () {
   {
       COMMAND=$(git add .)
@@ -53,47 +94,6 @@ setup_ip () {
 
 
 }
-
-
-form_top="
-  linux_manager -- $(basename "$0") -- Automates stuff on Linux
-
-"
-
-usage="
-  Options:      Syntax:                             Description:
-
-      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-      -h        [mgr -h]                            show this help text
-      -n        [mgr -n dns]                            Change your DNS, Static IP address, VPN. (NetworkManager)
-
-"
-
-usage_git="
-  Options:      Syntax:                             Description:
-  
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-
-
-"
-
-usage_backup="
-  Options:      Syntax:                             Description:
-  
-      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
-
-
-"
-usage_network="
-  Options:      Syntax:                             Description:
-  
-      -n        [mgr -n]                            Shows this message
-      ip        [mgr -n ip]                         Change your Static IP address
-      dns       [mgr -n dns]                        Change your DNS
-
-
-"
 
 while getopts ':-hbgn' option; do
   case "$option" in
