@@ -54,7 +54,7 @@ usage_network="
 
 automatic_git () {
   {
-      COMMAND=$(git checkout -b "verif_branch" && git add . && git commit -m "$1" && git push && git checkout main && git branch --delete verif_branch && git push)
+      COMMAND=$(git add .)
   }
   CMD_RETURN_CODE=$?
 
