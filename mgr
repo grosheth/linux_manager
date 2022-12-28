@@ -54,16 +54,17 @@ usage_network="
 
 automatic_git () {
   {
-      COMMAND=$(git add .)
+      COMMAND=$(git add . && git commit -m "$1")
   }
+  echo $COMMAND
   CMD_RETURN_CODE=$?
 
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}Failed"
-        git add . && git commit -m "Automatic commit via mgr command" && git push
+        git add . && git commit -m "Erreur lors du push" && git push # This will show the output of the error
     else
-      echo -e "${GREEN}Success ${WHITE}"
+      echo -e "${LIGHT_GREEN}Success ${WHITE}"
       git add . && git commit -m "$1" && git push
     fi
 }
@@ -82,7 +83,8 @@ setup_dns () {
   echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
   echo "Your actual DNS:  "
   grep "nameserver" /etc/resolv.conf
-  read -n 1 -p "Do you want to add a new DNS or modify one?:" dns_change 
+  read -n 1 -p "Do you want to add a new DNS or modify one?:" dns_change
+
 
 }
 
@@ -94,6 +96,20 @@ setup_ip () {
 
 
 }
+
+setup_python_venv () {
+  APP_NAME="$1"
+  cd
+  cd Desktop/
+  mkdir $APP_NAME
+  cd $APP_NAME
+  python -m venv newenv
+  source newenv/bin/activate
+  pip install --upgrade pip
+  pip install -r requirements.txt
+  code .
+}
+
 
 while getopts ':-hbgn' option; do
   case "$option" in
