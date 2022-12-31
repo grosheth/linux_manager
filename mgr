@@ -64,7 +64,7 @@ automatic_git () {
         git add .
     else
       echo -e "${LIGHT_GREEN}Success ${WHITE}"
-      git add . && git commit -m "$1" && git push --set-upstream origin verif_branch
+      git add . && git commit -m "$1" && git push
     fi
 }
 
