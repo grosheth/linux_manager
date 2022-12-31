@@ -12,34 +12,32 @@ LIGHT_GREEN='\033[0;32m'
 
 
 form_top="
-  linux_manager -- $(basename "$0") -- Automates stuff on Linux
+  linux_manager -- $(basename "$0") -- Automate common programming tasks on Linux
 
 "
 
 usage="
-  Options:      Syntax:                             Description:
+    Options:      Syntax:                             Description:
 
-      -h        [mgr -h]                            show this help text
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-      -p        [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
+    -h            [mgr -h]                            show this help text
+    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+    -p            [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
 
 "
 
 usage_git="
-  Options:      Syntax:                             Description:
+    Options:      Syntax:                             Description:
   
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-
+    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
 
 "
 
 usage_python_venv="
-  Options:      Syntax:                             Description:
+    Options:      Syntax:                             Description:
   
-      -p        [mgr -p]                            shows this help message
-      venv      [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
-      <name>    [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
-
+    -p            [mgr -p]                            shows this help message
+    venv          [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
+    <name>        [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
 
 "
 

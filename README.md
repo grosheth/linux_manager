@@ -1,3 +1,3 @@
 # linux_manager
 
-Automate recurrent commands and annoying installations
+Automate common programming tasks on Linux
