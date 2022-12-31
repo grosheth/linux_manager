@@ -66,6 +66,7 @@ setup_python_venv () {
   else
     touch requirements.txt
   fi
+  code .
 }
 
 setup_python_project () {
