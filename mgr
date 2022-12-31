@@ -41,11 +41,12 @@ usage_backup="
 
 
 "
+
 usage_network="
   Options:      Syntax:                             Description:
   
       -n        [mgr -n]                            Shows this message
-      ip        [mgr -n ip]                         Change your Static IP address
+      ip        [mgr -n ip]                         Add a static IP address to one of your network interface
       dns       [mgr -n dns]                        Change your DNS
 
 
@@ -74,7 +75,7 @@ backup_files () {
   cp -R ~/.ssh $1
   cp ~/.zshrc $1
   cp ~/.bashrc $1
-  cp -R ~/.minecraft
+  cp -R ~/.minecraft $1
   echo -e "${LIGHT_GREEN} --- Success ---"
 }
 
@@ -82,17 +83,19 @@ setup_dns () {
   echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
   echo "Your actual DNS:  "
   grep "nameserver" /etc/resolv.conf
-  read -n 1 -p "Do you want to add a new DNS or modify one?:" dns_change
-
-
+  read -n 50 -p "What is the address of the dns you want to add?:" dns_change
+  sudo echo "nameserver $dns_change" >> /etc/resolv.conf
 }
 
 setup_ip () {
   echo -e "${YELLOW} --- Change your IP Address --- ${WHITE}"
   echo "Here are your Network cards:  "
   ip a
-  read  -n 1 -p "Which Network card do you want to modify?:" network_card
-
+  echo -e "${CYAN}"
+  read -n 50 -p "Which Network card do you want to modify?:" network_card
+  read -n 50 -p "Which IP address do you want? (Specify the prefix):" ip_address
+  echo -e "${WHITE}"
+  sudo ip addr add $ip_address dev $network_card
 }
 
 setup_python_venv () {
