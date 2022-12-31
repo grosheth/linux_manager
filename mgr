@@ -41,13 +41,10 @@ usage_backup="
 
 
 "
-
-usage_network="
+usage_python_venv="
   Options:      Syntax:                             Description:
   
-      -n        [mgr -n]                            Shows this message
-      ip        [mgr -n ip]                         Add a static IP address to one of your network interface
-      dns       [mgr -n dns]                        Change your DNS
+      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
 
 
 "
@@ -68,7 +65,7 @@ automatic_git () {
     fi
 }
 
-backup_files () { 
+backup_files () {
   echo -e "${YELLOW} --- Creating Backups ---${WHITE}"
 
   [ -d $1 ] || mkdir $1
@@ -79,32 +76,31 @@ backup_files () {
   echo -e "${LIGHT_GREEN} --- Success ---"
 }
 
-setup_dns () {
-  echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
-  echo "Your actual DNS:  "
-  grep "nameserver" /etc/resolv.conf
-  read -n 50 -p "What is the address of the dns you want to add?:" dns_change
-  sudo echo "nameserver $dns_change" >> /etc/resolv.conf
-}
+# setup_dns () {
+#   echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
+#   echo "Your actual DNS:  "
+#   grep "nameserver" /etc/resolv.conf
+#   read -n 50 -p "What is the address of the dns you want to add?:" dns_change
+#   sudo echo "nameserver $dns_change" >> /etc/resolv.conf
+# }
 
-setup_ip () {
-  echo -e "${YELLOW} --- Change your IP Address --- ${WHITE}"
-  echo "Here are your Network cards:  "
-  ip a
-  echo -e "${CYAN}"
-  read -n 50 -p "Which Network card do you want to modify?:" network_card
-  read -n 50 -p "Which IP address do you want? (Specify the prefix):" ip_address
-  echo -e "${WHITE}"
-  sudo ip addr add $ip_address dev $network_card
-}
+# setup_ip () {
+#   echo -e "${YELLOW} --- Change your IP Address --- ${WHITE}"
+#   echo "Here are your Network cards:  "
+#   ip a
+#   echo -e "${CYAN}"
+#   read -n 50 -p "Which Network card do you want to modify?:" network_card
+#   read -n 50 -p "Which IP address do you want? (Specify the prefix):" ip_address
+#   echo -e "${WHITE}"
+#   sudo ip addr add $ip_address dev $network_card
+# }
 
 setup_python_venv () {
   APP_NAME="$1"
-  cd Desktop/
   mkdir $APP_NAME
   cd $APP_NAME
-  python -m venv newenv
-  source newenv/bin/activate
+  python3 -m venv .venv
+  source .venv/bin/activate
   pip install --upgrade pip
   pip install -r requirements.txt
   code .
@@ -112,7 +108,7 @@ setup_python_venv () {
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-hbgn' option; do
+while getopts ':-hbgnp' option; do
   case "$option" in
     h) echo "$form_top $usage"
        exit
@@ -131,20 +127,27 @@ while getopts ':-hbgn' option; do
         automatic_git $2
       fi
       ;;
-    n)
+    p)
       if [ -z $2 ]; then
-        echo "$form_top $usage_network"
+        echo "$form_top $usage_git"
       else
-        case $2 in
-          dns)
-            setup_dns
-            ;;
-          ip)
-            setup_ip
-            ;;
-        esac
+        automatic_git $2
       fi
       ;;
+    # n)
+    #   if [ -z $2 ]; then
+    #     echo "$form_top $usage_network"
+    #   else
+    #     case $2 in
+    #       dns)
+    #         setup_dns
+    #         ;;
+    #       ip)
+    #         setup_ip
+    #         ;;
+    #     esac
+    #   fi
+    #   ;;
    \?) echo "illegal option:" "$OPTARG" >&2
        echo "$form_top $usage" >&2
        exit 1
