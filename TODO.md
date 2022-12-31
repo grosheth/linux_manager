@@ -1,13 +1,10 @@
 # linux_manager
 
-- VM stuff
+- Create repo on Github with API
 
 - Tests automation with Docker
 
-- Enable VPN ( openvpn, maybe others )
-
-- Setup Python project and Venv
+- VM stuff
 
 ## Maybe
-
-- Orient program towards a coding assistant instead
+- Enable VPN ( openvpn, maybe others )

@@ -19,10 +19,9 @@ form_top="
 usage="
   Options:      Syntax:                             Description:
 
-      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
-      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
       -h        [mgr -h]                            show this help text
-      -n        [mgr -n dns]                            Change your DNS, Static IP address, VPN. (NetworkManager)
+      -g        [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+      -p        [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
 
 "
 
@@ -34,17 +33,12 @@ usage_git="
 
 "
 
-usage_backup="
-  Options:      Syntax:                             Description:
-  
-      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
-
-
-"
 usage_python_venv="
   Options:      Syntax:                             Description:
   
-      -b        [mgr -b /full/path/to/backup/]      Create a backup for your bookmarks, .ssh folder, .zshrc and .bashrc
+      -p        [mgr -p]                            shows this help message
+      venv      [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
+      <name>    [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
 
 
 "
@@ -65,50 +59,28 @@ automatic_git () {
     fi
 }
 
-backup_files () {
-  echo -e "${YELLOW} --- Creating Backups ---${WHITE}"
-
-  [ -d $1 ] || mkdir $1
-  cp -R ~/.ssh $1
-  cp ~/.zshrc $1
-  cp ~/.bashrc $1
-  cp -R ~/.minecraft $1
-  echo -e "${LIGHT_GREEN} --- Success ---"
-}
-
-# setup_dns () {
-#   echo -e "${YELLOW} --- Change your DNS --- ${WHITE}"
-#   echo "Your actual DNS:  "
-#   grep "nameserver" /etc/resolv.conf
-#   read -n 50 -p "What is the address of the dns you want to add?:" dns_change
-#   sudo echo "nameserver $dns_change" >> /etc/resolv.conf
-# }
-
-# setup_ip () {
-#   echo -e "${YELLOW} --- Change your IP Address --- ${WHITE}"
-#   echo "Here are your Network cards:  "
-#   ip a
-#   echo -e "${CYAN}"
-#   read -n 50 -p "Which Network card do you want to modify?:" network_card
-#   read -n 50 -p "Which IP address do you want? (Specify the prefix):" ip_address
-#   echo -e "${WHITE}"
-#   sudo ip addr add $ip_address dev $network_card
-# }
-
 setup_python_venv () {
-  APP_NAME="$1"
-  mkdir $APP_NAME
-  cd $APP_NAME
   python3 -m venv .venv
   source .venv/bin/activate
   pip install --upgrade pip
-  pip install -r requirements.txt
-  code .
+  if [ -f requirements.txt ]; then
+    pip install -r requirements.txt
+  else
+    touch requirements.txt
+  fi
 }
+
+setup_python_project () {
+  PROJECT_NAME=$1
+  mkdir $PROJECT_NAME
+  cd $PROJECT_NAME
+  setup_python_venv
+}
+
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-hbgnp' option; do
+while getopts ':-hgp' option; do
   case "$option" in
     h) echo "$form_top $usage"
        exit
@@ -129,25 +101,18 @@ while getopts ':-hbgnp' option; do
       ;;
     p)
       if [ -z $2 ]; then
-        echo "$form_top $usage_git"
+        echo "$form_top $usage_python_venv"
       else
-        automatic_git $2
+        case $2 in
+          venv)
+            setup_python_venv
+            ;;
+          *)
+            setup_python_project $2
+            ;;
+        esac
       fi
       ;;
-    # n)
-    #   if [ -z $2 ]; then
-    #     echo "$form_top $usage_network"
-    #   else
-    #     case $2 in
-    #       dns)
-    #         setup_dns
-    #         ;;
-    #       ip)
-    #         setup_ip
-    #         ;;
-    #     esac
-    #   fi
-    #   ;;
    \?) echo "illegal option:" "$OPTARG" >&2
        echo "$form_top $usage" >&2
        exit 1
