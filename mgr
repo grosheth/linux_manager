@@ -88,7 +88,7 @@ setup_python_project () {
 
 create_github_token () {
   read -p "Set your Github Token: " github_token
-  echo $github_token >> token
+  echo $github_token > token
 }
 
 create_github_repo () {
