@@ -20,7 +20,7 @@ usage="
     Options:      Syntax:                             Description:
 
     -h            [mgr -h]                            show this help text
-    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
+    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory. Also uses the Github API
     -p            [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
 
 "
@@ -30,15 +30,15 @@ usage_git="
   
     -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
     token         [mgr -g token]                      Creates a environment var with your Token to call the Github API
-    repo          [mgr -g repo]            Creates a repo on Github
+    repo          [mgr -g repo]                       Creates a repo on Github
 
 "
 usage_git_repo="
     Options:      Syntax:                             Description:
 
     repo          [mgr -g repo name private]          Creates a repo on Github
-    name          [mgr -g repo new_project private]   Represent the name of the repo
-    private       [mgr -g repo new_project true]      Bool 'true' or 'false' to set the repo public or private
+    name          [mgr -g repo newproject private]    Represent the name of the repo
+    private       [mgr -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
 
 "
 
@@ -92,20 +92,17 @@ create_github_token () {
 }
 
 create_github_repo () {
-  if [ -z "${DEPLOY_ENV}" ]; then
+  if [ ! -f ./token ]; then
     create_github_token
-  else
-    TOKEN=$(cat token)
-    curl \
-      -X POST \
-      -H "Accept: application/vnd.github+json" \
-      -H "Authorization: Bearer $TOKEN"\
-      -H "X-GitHub-Api-Version: 2022-11-28" \
-      https://api.github.com/orgs/ORG/repos \
-      -d '{"name":$1,"description":"$1","homepage":"https://github.com","private":$2,"has_issues":true,"has_projects":true,"has_wiki":true}'
   fi
+  TOKEN=$(cat token)
+  curl \
+    -X POST \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: token $TOKEN" \
+    -d '{"name":"'$1'","private":"'$2'", "homepage":"https://github.com"}' \
+    https://api.github.com/user/repos
 }
-
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
