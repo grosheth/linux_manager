@@ -37,7 +37,7 @@ usage_git_repo="
     Options:      Syntax:                             Description:
 
     repo          [mgr -g repo name private]          Creates a repo on Github
-    name          [mgr -g repo newproject private]    Represent the name of the repo
+    name          [mgr -g repo newproject private]    Name of the repo you want to create
     private       [mgr -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
 
 "

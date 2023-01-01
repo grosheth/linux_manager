@@ -1,7 +1,5 @@
 # linux_manager
 
-- Create repo on Github with API
-
 - Tests automation with Docker
 
 - VM stuff
