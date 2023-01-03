@@ -27,10 +27,11 @@ usage="
 
 usage_git="
     Options:      Syntax:                             Description:
-  
+
     -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
     token         [mgr -g token]                      Creates a environment var with your Token to call the Github API
     repo          [mgr -g repo]                       Creates a repo on Github
+    init          [mgr -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 
 "
 usage_git_repo="
@@ -42,9 +43,19 @@ usage_git_repo="
 
 "
 
+usage_git_init="
+    Options:      Syntax:                               Description:
+
+    init          [mgr -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
+    user          [mgr -g init user name private]       Your Github username.
+    name          [mgr -g init user project private]    Name of the repo you want to create
+    private       [mgr -g init user project true]       Bool 'true' or 'false' to set the repo public or private
+
+"
+
 usage_python_venv="
     Options:      Syntax:                             Description:
-  
+
     -p            [mgr -p]                            shows this help message
     venv          [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
     <name>        [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
@@ -88,20 +99,35 @@ setup_python_project () {
 
 create_github_token () {
   read -p "Set your Github Token: " github_token
-  echo $github_token > token
+  echo $github_token > ~/.mgr/token
 }
 
 create_github_repo () {
-  if [ ! -f ./token ]; then
+  if [ ! -f ~/.mgr/token ]; then
     create_github_token
   fi
-  TOKEN=$(cat token)
+  TOKEN=$(cat ~/.mgr/token)
   curl \
     -X POST \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: token $TOKEN" \
     -d '{"name":"'$1'","private":"'$2'", "homepage":"https://github.com"}' \
     https://api.github.com/user/repos
+}
+
+github_init () {
+
+  [ -f ~/.mgr/token ] || create_github_token
+  TOKEN=$(cat ~/.mgr/token)
+  COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
+
+  if [ ! -z "$COMMAND" ]; then
+    create_github_repo $2 $3
+  fi
+
+  git init
+  git remote add $2 git@github.com:$1/$2.git
+
 }
 
 no_args="true"
@@ -123,10 +149,24 @@ while getopts ':-hgp' option; do
             if [ -z $3 ]; then
               echo "$form_top $usage_git_repo"
             else
-              if [ -z $4 ]; then 
-                $4="true"
+              if [ -z $4 ]; then
+                private="true"
+              else
+                private=$4
               fi
-              create_github_repo $3 $4
+              create_github_repo $3 private
+            fi
+            ;;
+          init)
+            if [ -z $3 ]; then
+              echo "$form_top $usage_git_init"
+            else
+              if [ -z $5 ]; then
+                private="true"
+              else
+                private=$5
+              fi
+                github_init $3 $4 private
             fi
             ;;
           *)
@@ -157,6 +197,7 @@ while getopts ':-hgp' option; do
   no_args="false"
 done
 
+[ -d ~/.mgr ] || mkdir ~/.mgr
 [[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
 shift "$(($OPTIND-1))"
 
