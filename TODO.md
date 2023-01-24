@@ -4,7 +4,3 @@
 
 - VM stuff
 
-## Maybe
-
-- Enable VPN ( openvpn, tor )
-
