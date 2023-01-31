@@ -97,14 +97,15 @@ setup_python_project () {
   setup_python_venv
 }
 
-create_github_token () {
+add_github_token () {
   read -p "Set your Github Token: " github_token
   echo $github_token > ~/.mgr/token
 }
 
+
 create_github_repo () {
   if [ ! -f ~/.mgr/token ]; then
-    create_github_token
+    add_github_token
   fi
   TOKEN=$(cat ~/.mgr/token)
   curl \
@@ -115,9 +116,10 @@ create_github_repo () {
     https://api.github.com/user/repos
 }
 
+
 github_init () {
 
-  [ -f ~/.mgr/token ] || create_github_token
+  [ -f ~/.mgr/token ] || add_github_token
   TOKEN=$(cat ~/.mgr/token)
   COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
 
@@ -129,6 +131,7 @@ github_init () {
   git remote add $2 git@github.com:$1/$2.git
 
 }
+
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
@@ -143,7 +146,7 @@ while getopts ':-hgp' option; do
       else
         case $2 in
           token)
-            create_github_token
+            add_github_token
             ;;
           repo)
             if [ -z $3 ]; then
