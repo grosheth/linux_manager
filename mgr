@@ -74,9 +74,10 @@ automatic_git () {
         git add .
     else
       echo -e "${LIGHT_GREEN}Success ${WHITE}"
-      git add . && git commit -m "${@:1:10}" && git push
+      git add . && git commit -m "$1" && git push
     fi
 }
+
 
 setup_python_venv () {
   python3 -m venv .venv
