@@ -1,6 +1,7 @@
 # linux_manager
 
-- Tests automation with Docker
+- Auto update system (Arch, Fedora, Debian)
 
-- VM stuff
+- Create backups
 
+- Add Github Actions pipeline to automatically install on servers when there is an update
