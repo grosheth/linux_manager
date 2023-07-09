@@ -15,7 +15,7 @@ jobs:
         run: chmod 775 installation.sh
 
       - name: Execute installation script
-        run: sh installation.sh
+        run: bash installation.sh
 
       - name: Test mgr command
         run: mgr
