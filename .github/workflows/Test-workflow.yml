@@ -18,9 +18,6 @@ jobs:
         run: bash installation.sh
 
       - name: Test mgr version
-        run: pwd
-
-      - name: Test mgr version
         run: bash mgr -v
 
       - name: Test mgr update
@@ -36,7 +33,7 @@ jobs:
         run: mkdir python-test && cd python-test && bash $HOME/work/linux_manager/linux_manager/mgr -p venv && ls -la
 
       - name: Create a New Python Project
-        run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test cd python-repo-test && ls -la
+        run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test && cd python-repo-test && ls -la
 
       - name: Test mgr git
         run: bash mgr -g
