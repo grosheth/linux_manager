@@ -46,8 +46,8 @@ done
 CMD_RETURN_CODE=$?
 
 if [ $CMD_RETURN_CODE != 0 ]; then
+    echo "Done"
+else
     echo "program is installed here: "
     which mgr
-else
-    echo "Done"
 fi
