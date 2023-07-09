@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # Colors
-BLACK='\033[1;30m'
-RED='\033[1;31m'
-GREEN='\033[1;32m'
-CYAN='\033[1;33m'
-BLUE='\033[1;34m'
-YELLOW='\033[1;36m'
-WHITE='\033[1;37m'
-LIGHT_GREEN='\033[0;32m'
+BLACK='\033[0;30m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;33m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;36m'
+WHITE='\033[0;37m'
 
 
 form_top="
@@ -19,46 +18,47 @@ form_top="
 usage="
     Options:      Syntax:                             Description:
 
-    -h            [mgr -h]                            show this help text
-    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory. Also uses the Github API
-    -p            [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
+    -g            [$(basename "$0") -g 'commit message']           Simplify Git commands. Can also use GitHub API.
+    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment and requirements.txt
+    -a            [$(basename "$0") -a]                            Manages Application can manage some services on systemd (Needs sudo)
+    -u            [$(basename "$0") -u]                            Updates current System (Needs sudo)
 
 "
 
 usage_git="
     Options:      Syntax:                             Description:
 
-    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-    token         [mgr -g token]                      Creates a environment var with your Token to call the Github API
-    repo          [mgr -g repo]                       Creates a repo on Github
-    init          [mgr -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
+    -g            [$(basename "$0")  -g 'commit message']           Git add,commit, and push to Git in the current directory.
+    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API
+    repo          [$(basename "$0") -g repo]                       Creates a repo on Github
+    init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 
 "
 usage_git_repo="
     Options:      Syntax:                             Description:
 
-    repo          [mgr -g repo name private]          Creates a repo on Github
-    name          [mgr -g repo newproject private]    Name of the repo you want to create
-    private       [mgr -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
+    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github
+    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create
+    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
 
 "
 
 usage_git_init="
     Options:      Syntax:                               Description:
 
-    init          [mgr -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
-    user          [mgr -g init user name private]       Your Github username.
-    name          [mgr -g init user project private]    Name of the repo you want to create
-    private       [mgr -g init user project true]       Bool 'true' or 'false' to set the repo public or private
+    init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
+    user          [$(basename "$0") -g init user name private]       Your Github username.
+    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create
+    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private
 
 "
 
 usage_python_venv="
     Options:      Syntax:                             Description:
 
-    -p            [mgr -p]                            shows this help message
-    venv          [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
-    <name>        [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
+    -p            [$(basename "$0") -p]                            shows this help message
+    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt
+    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
 
 "
 
@@ -74,7 +74,7 @@ automatic_git () {
         echo -e "${RED}Failed"
         git add .
     else
-      echo -e "${LIGHT_GREEN}Success ${WHITE}"
+      echo -e "${GREEN}Success ${WHITE}"
       git add . && git commit -m "${STRING}" && git push
     fi
 }
@@ -106,10 +106,10 @@ add_github_token () {
 
 
 create_github_repo () {
-  if [ ! -f ~/.mgr/token ]; then
+  if [ ! -f ~/.$(basename "$0")/token ]; then
     add_github_token
   fi
-  TOKEN=$(cat ~/.mgr/token)
+  TOKEN=$(cat ~/.$(basename "$0")/token)
   curl \
     -X POST \
     -H "Accept: application/vnd.github+json" \
@@ -118,10 +118,9 @@ create_github_repo () {
     https://api.github.com/user/repos
 }
 
-
 github_init () {
 
-  [ -f ~/.mgr/token ] || add_github_token
+  [ -f ~/.$(basename "$0")/token ] || add_github_token
   TOKEN=$(cat ~/.mgr/token)
   COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
 
@@ -134,14 +133,54 @@ github_init () {
 
 }
 
+check_system () {
+  {
+      COMMAND=$(cat /etc/os-release)
+  }
+  CMD_RETURN_CODE=$?
+
+  if [ $CMD_RETURN_CODE != 0 ]; then
+    echo -e "${RED}No os-release file was found on the server"
+  else
+    SYSTEM=$(cat /etc/os-release)
+  fi
+}
+
+
+update_system () {
+  check_system
+
+  if [ -z $SYSTEM ]; then
+    echo "make sure /etc/os-release file or symbolic link exists"
+  else
+
+    if [[ $SYSTEM == *"arch"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo pacman -Syu --noconfirm
+    fi
+
+    if [[ $SYSTEM == *"debian"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo apt-get update && sudo apt-get upgrade -y
+    fi
+
+    if [[ $SYSTEM == *"fedora"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo dnf upgrade -y
+    fi
+
+  fi
+
+}
+
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-hgp' option; do
+while getopts ':-gpua' option; do
   case "$option" in
-    h) echo "$form_top $usage"
-       exit
-       ;;
     g)
       if [ -z $2 ]; then
         echo "$form_top $usage_git"
@@ -194,6 +233,9 @@ while getopts ':-hgp' option; do
         esac
       fi
       ;;
+    u)
+      update_system
+      ;;
    \?) echo "illegal option:" "$OPTARG" >&2
        echo "$form_top $usage" >&2
        exit 1
@@ -202,7 +244,7 @@ while getopts ':-hgp' option; do
   no_args="false"
 done
 
-[ -d ~/.mgr ] || mkdir ~/.mgr
+[ -d ~/.$(basename "$0") ] || mkdir ~/.$(basename "$0")
 [[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
 shift "$(($OPTIND-1))"
 
