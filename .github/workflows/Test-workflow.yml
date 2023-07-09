@@ -18,6 +18,9 @@ jobs:
         run: bash installation.sh
 
       - name: Test mgr version
+        run: pwd
+
+      - name: Test mgr version
         run: bash mgr -v
 
       - name: Test mgr update
@@ -30,7 +33,7 @@ jobs:
         run: bash mgr -p
 
       - name: Create a Python venv
-        run: mkdir python-test && cd python-test && bash mgr -p venv && ls -la
+        run: mkdir python-test && cd python-test && bash ../mgr -p venv && ls -la
 
       - name: Create a New Python Project
         run: cd ~ && bash mgr -p python-repo-test cd python-repo-test && ls -la
@@ -38,3 +41,5 @@ jobs:
       - name: Test mgr git
         run: bash mgr -g
 
+      # - name: Check if current dev version is not already released
+      #   run: check current tags on GH
