@@ -11,6 +11,9 @@ jobs:
       - name: Get Project on Git
         uses: actions/checkout@v3.5.3
 
+      - name: Install which
+        run: chmod 775 installation.sh
+
       - name: Adjust rights on installation script
         run: chmod 775 installation.sh
 
