@@ -18,17 +18,10 @@ jobs:
         run: bash installation.sh
 
       - name: Test mgr command
-        run: whoami
-
-      - name: Test mgr command
-        run: ls -la ~/.local/bin
-
-      - name: Test mgr command
         run: ls -la $HOME/.local/bin
-        
 
       - name: Test mgr command
-        run: mgr
+        run: bash mgr
 
       - name: Test version function
         run: mgr -v
