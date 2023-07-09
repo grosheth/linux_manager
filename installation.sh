@@ -1,5 +1,3 @@
-#!/usr/bin/sh
-
 function ProgressBar {
 # Process data
 	let _progress=(${1}*100/${2}*100)/100
@@ -40,4 +38,5 @@ do
 	ProgressBar ${number} ${_end} ${steps}
 done
 
-echo "program is installed here: " && which mgr
+echo "program is installed here: "
+which mgr

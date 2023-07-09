@@ -12,14 +12,10 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Adjust rights on installation script
-        run: ls -la
-
-      - name: Adjust rights on installation script
         run: chmod 775 installation.sh
 
       - name: Execute installation script
         run: sh installation.sh
-         
 
       - name: Test mgr command
         run: mgr
