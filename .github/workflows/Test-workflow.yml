@@ -11,14 +11,17 @@ jobs:
       - name: Get Project on Git
         uses: actions/checkout@v3.5.3
 
-      - name: Install which
-        run: chmod 775 installation.sh
-
       - name: Adjust rights on installation script
-        run: chmod 775 installation.sh
+        run: chmod 755 installation.sh
 
       - name: Execute installation script
         run: bash installation.sh
+
+      - name: Test mgr command
+        run: whoami
+
+      - name: Test mgr command
+        run: ls -la ~/.local/bin
 
       - name: Test mgr command
         run: mgr
