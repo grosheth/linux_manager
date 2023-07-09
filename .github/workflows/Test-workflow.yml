@@ -17,11 +17,14 @@ jobs:
       - name: Execute installation script
         run: bash installation.sh
 
-      - name: Test mgr command
-        run: ls -la $HOME/.local/bin
+      - name: Test mgr version
+        run: bash mgr -v
 
-      - name: Test mgr command
-        run: bash mgr
+      - name: Test mgr python
+        run: bash mgr -p
 
-      - name: Test version function
-        run: mgr -v
+      - name: Test mgr git
+        run: bash mgr -g
+
+      - name: Test mgr update
+        run: bash mgr -u
