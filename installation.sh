@@ -25,8 +25,6 @@ _end=2
 # Proof of concept
 for number in $(seq ${_start} ${_end})
 do
-	sleep 1
-
     # Changes permissions on mgr
     if [[ $number == 1 ]]; then
         steps="Setting_permissions"

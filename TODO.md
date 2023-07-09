@@ -6,6 +6,8 @@
 
 - Add Github Actions pipeline to automatically install on servers when there is an update
 
+- Add versionning to mgr
+
 # New Features
 
 - Make it control some services.

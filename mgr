@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Version
+VERSION='1.0.0'
+
 # Colors
 BLACK='\033[0;30m'
 RED='\033[0;31m'
@@ -11,7 +14,7 @@ WHITE='\033[0;37m'
 
 
 form_top="
-  linux_manager -- $(basename "$0") -- Automate common programming tasks on Linux
+  linux_manager -- $(basename "$0") $VERSION -- Automate common programming tasks on Linux
 
 "
 
@@ -179,7 +182,7 @@ update_system () {
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpua' option; do
+while getopts ':-gpuav' option; do
   case "$option" in
     g)
       if [ -z $2 ]; then
@@ -235,6 +238,9 @@ while getopts ':-gpua' option; do
       ;;
     u)
       update_system
+      ;;
+    v)
+      echo $VERSION
       ;;
    \?) echo "illegal option:" "$OPTARG" >&2
        echo "$form_top $usage" >&2

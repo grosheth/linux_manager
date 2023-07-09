@@ -1,0 +1,13 @@
+name: Test Workflow
+run-name: Test Workflow
+on: 
+  push:
+    branches:
+      - main
+      - master
+jobs:
+  Deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Project on Git
+        uses: actions/checkout@v3.5.3
