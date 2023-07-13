@@ -20,7 +20,7 @@ printf "\r ${3} : [${_done// /#}${_left// /-}] ${_progress}%%\n"
 _start=1
 
 # This is the amount of tasks that needs to be done in the installation
-_end=2
+_end=3
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -31,8 +31,14 @@ do
         chmod 711 mgr
     fi
 
-    # Copies mgr binary for local user
+    # Changes permissions on uninstall script
     if [[ $number == 2 ]]; then
+        steps="Setting_permissions"
+        chmod 711 uninstall.sh
+    fi
+
+    # Copies mgr binary for local user
+    if [[ $number == 3 ]]; then
         steps="Copying_files"
         cp mgr $HOME/.local/bin
     fi
@@ -45,9 +51,10 @@ done
 }
 CMD_RETURN_CODE=$?
 
-if [ $CMD_RETURN_CODE != 0 ]; then
-    echo "Done"
-else
+if [ $CMD_RETURN_CODE == 0 ]; then
     echo "program is installed here: "
     which mgr
+else
+    echo "Done"
+
 fi
