@@ -20,7 +20,7 @@ printf "\r ${3} : [${_done// /#}${_left// /-}] ${_progress}%%\n"
 _start=1
 
 # This is the amount of tasks that needs to be done in the installation
-_end=3
+_end=5
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -37,8 +37,20 @@ do
         chmod 711 uninstall.sh
     fi
 
-    # Copies mgr binary for local user
+    # Create the .mgr folder
     if [[ $number == 3 ]]; then
+        steps="Create_folder"
+        mkdir $HOME/.mgr
+    fi
+
+    # Create the dependencies file
+    if [[ $number == 4 ]]; then
+        steps="Create_folder"
+        touch $HOME/.mgr/dependencies
+    fi
+
+    # Copies mgr binary for local user
+    if [[ $number == 5 ]]; then
         steps="Copying_files"
         cp mgr $HOME/.local/bin
     fi

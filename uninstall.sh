@@ -20,15 +20,21 @@ printf "\r ${3} : [${_done// /#}${_left// /-}] ${_progress}%%\n"
 _start=1
 
 # This is the amount of tasks that needs to be done in the installation
-_end=1
+_end=2
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
 do
-    # Changes permissions on mgr
+    # removing binary
     if [[ $number == 1 ]]; then
-        steps="removing binary"
+        steps="removing_binary"
         rm $HOME/.local/bin/mgr
+    fi
+
+    # removing home folder
+    if [[ $number == 2 ]]; then
+        steps="removing_folder"
+        rm -rf $HOME/.mgr
     fi
 
 	ProgressBar ${number} ${_end} ${steps}

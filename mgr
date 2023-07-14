@@ -19,26 +19,29 @@ form_top="
 "
 
 usage="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
     -g            [$(basename "$0") -g 'commit message']           Simplify Git commands. Can also use GitHub API.
     -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment and requirements.txt
     -a            [$(basename "$0") -a]                            Manages Application can manage some services on systemd (Needs sudo)
     -u            [$(basename "$0") -u]                            Updates current System (Needs sudo)
+    -v            [$(basename "$0") -v]                            Current version of mgr
+    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file (Needs sudo)
+
 
 "
 
 usage_git="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
-    -g            [$(basename "$0")  -g 'commit message']           Git add,commit, and push to Git in the current directory.
+    -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
     token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API
     repo          [$(basename "$0") -g repo]                       Creates a repo on Github
     init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 
 "
 usage_git_repo="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
     repo          [$(basename "$0") -g repo name private]          Creates a repo on Github
     name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create
@@ -47,7 +50,7 @@ usage_git_repo="
 "
 
 usage_git_init="
-    Options:      Syntax:                               Description:
+    Options:      Syntax:                                            Description:
 
     init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
     user          [$(basename "$0") -g init user name private]       Your Github username.
@@ -57,13 +60,23 @@ usage_git_init="
 "
 
 usage_python_venv="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
     -p            [$(basename "$0") -p]                            shows this help message
     venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt
     <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
 
 "
+
+usage_install_dependencies="
+    Options:      Syntax:                                          Description:
+
+    -d            [$(basename "$0") -d]                            shows this help message
+    list          [$(basename "$0") -d list]                       lists the current dependencies to install
+    add           [$(basename "$0") -d add <package name>]         Add dependencies to $(basename "$0")/dependencies
+    install       [$(basename "$0") -d install]                    Install the dependencies located in $(basename "$0")/dependencies
+"
+
 
 automatic_git () {
   {
@@ -147,8 +160,8 @@ check_system () {
   else
     SYSTEM=$(cat /etc/os-release)
   fi
-}
 
+}
 
 update_system () {
   check_system
@@ -179,10 +192,56 @@ update_system () {
 
 }
 
+add_dependencies () {
+  LIST=$@
+
+  for package in $LIST
+  do
+    if [[ ${package} != '-d' && ${package} != 'add' ]]; then
+      echo -e ${package} >> $HOME/.$(basename "$0")/dependencies
+    fi
+  done
+
+}
+
+install_dependencies () {
+  check_system
+
+    PACKAGE_LIST=$(cat $HOME/.$(basename "$0")/dependencies)
+
+    if [[ $SYSTEM == *"arch"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
+      
+      for package in $PACKAGE_LIST
+      do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo pacman -S ${package} --noconfirm
+      done
+    fi
+
+    if [[ $SYSTEM == *"debian"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
+      for package in $PACKAGE_LIST
+      do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo apt-get install ${package}  -y
+      done
+    fi
+
+    if [[ $SYSTEM == *"fedora"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
+      for package in $PACKAGE_LIST
+      do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo dnf install ${package} -y
+      done
+    fi
+
+}
 
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpuav' option; do
+while getopts ':-gpuavd' option; do
   case "$option" in
     g)
       if [ -z $2 ]; then
@@ -238,6 +297,26 @@ while getopts ':-gpuav' option; do
       ;;
     u)
       update_system
+      ;;
+    d)
+      if [ -z $2 ]; then
+        echo "$form_top $usage_install_dependencies"
+      else
+        case $2 in
+          list)
+            cat ~/.$(basename "$0")/dependencies
+            ;;
+          add)
+            add_dependencies $@
+            ;;
+          install)
+            add_dependencies $@
+            ;;
+          *)
+            echo "$form_top $usage_install_dependencies"
+            ;;
+        esac
+      fi
       ;;
     v)
       echo $VERSION
