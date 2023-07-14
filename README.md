@@ -2,7 +2,9 @@
 
 Automate common programming tasks on Linux
 
-Default name for the binary is 'mgr', the script handles changes in the name so rename it to anything you like. The installation scripts does not manage changes in the name though.
+Default name for the binary is 'mgr', the script handles changes in the name so rename it to anything you like. 
+
+***The installation scripts does not manage changes in the name***
 
 # Installation
 
