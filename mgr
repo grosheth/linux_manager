@@ -73,8 +73,8 @@ usage_install_dependencies="
 
     -d            [$(basename "$0") -d]                            shows this help message
     list          [$(basename "$0") -d list]                       lists the current dependencies to install
-    add           [$(basename "$0") -d add <package name>]         Add dependencies to $(basename "$0")/dependencies
-    install       [$(basename "$0") -d install]                    Install the dependencies located in $(basename "$0")/dependencies
+    add           [$(basename "$0") -d add <package name>]         Add dependencies to $HOME/$(basename "$0")/dependencies
+    install       [$(basename "$0") -d install]                    Install the dependencies located in $HOME/$(basename "$0")/dependencies
 "
 
 
@@ -94,7 +94,6 @@ automatic_git () {
       git add . && git commit -m "${STRING}" && git push
     fi
 }
-
 
 setup_python_venv () {
   python3 -m venv .venv
@@ -210,7 +209,7 @@ install_dependencies () {
     PACKAGE_LIST=$(cat $HOME/.$(basename "$0")/dependencies)
 
     if [[ $SYSTEM == *"arch"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
+      echo -e "${GREEN}According to os-release, your system is Arch based \n ${WHITE}"
       
       for package in $PACKAGE_LIST
       do
@@ -220,7 +219,7 @@ install_dependencies () {
     fi
 
     if [[ $SYSTEM == *"debian"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
+      echo -e "${GREEN}According to os-release, your system is Debian based \n${WHITE}"
       for package in $PACKAGE_LIST
       do
         echo -e "${GREEN}Installing ${package} ${WHITE}"
@@ -229,7 +228,7 @@ install_dependencies () {
     fi
 
     if [[ $SYSTEM == *"fedora"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
+      echo -e "${GREEN}According to os-release, your system is Fedora \n ${WHITE}"
       for package in $PACKAGE_LIST
       do
         echo -e "${GREEN}Installing ${package} ${WHITE}"
@@ -309,8 +308,11 @@ while getopts ':-gpuavd' option; do
           add)
             add_dependencies $@
             ;;
+          clear)
+            echo "" >  ~/.$(basename "$0")/dependencies
+            ;;
           install)
-            add_dependencies $@
+            install_dependencies
             ;;
           *)
             echo "$form_top $usage_install_dependencies"
