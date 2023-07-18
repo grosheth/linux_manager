@@ -22,30 +22,29 @@ usage="
     Options:      Syntax:                                          Description:
 
     -g            [$(basename "$0") -g 'commit message']           Simplify Git commands. Can also use GitHub API.
-    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment and requirements.txt
-    -a            [$(basename "$0") -a]                            Manages Application can manage some services on systemd (Needs sudo)
-    -u            [$(basename "$0") -u]                            Updates current System (Needs sudo)
-    -v            [$(basename "$0") -v]                            Current version of mgr
-    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file (Needs sudo)
-
-
+    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment and requirements.txt.
+    -a            [$(basename "$0") -a]                            Manages Application can manage some services on systemd. (Needs sudo)
+    -u            [$(basename "$0") -u]                            Updates current System. (Needs sudo)
+    -v            [$(basename "$0") -v]                            Current version of mgr.
+    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (Needs sudo)
+    -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (Needs sudo)
 "
 
 usage_git="
     Options:      Syntax:                                          Description:
 
     -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
-    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API
-    repo          [$(basename "$0") -g repo]                       Creates a repo on Github
+    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
+    repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
     init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 
 "
 usage_git_repo="
     Options:      Syntax:                                          Description:
 
-    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github
-    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create
-    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
+    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github.
+    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create.
+    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private.
 
 "
 
@@ -54,29 +53,40 @@ usage_git_init="
 
     init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
     user          [$(basename "$0") -g init user name private]       Your Github username.
-    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create
-    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private
+    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create.
+    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private.
 
 "
 
 usage_python_venv="
     Options:      Syntax:                                          Description:
 
-    -p            [$(basename "$0") -p]                            shows this help message
-    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt
-    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
+    -p            [$(basename "$0") -p]                            shows this help message.
+    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
+    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt.
 
 "
 
 usage_install_dependencies="
     Options:      Syntax:                                          Description:
 
-    -d            [$(basename "$0") -d]                            shows this help message
-    list          [$(basename "$0") -d list]                       lists the current dependencies to install
-    add           [$(basename "$0") -d add <package name>]         Add dependencies to $HOME/$(basename "$0")/dependencies
-    install       [$(basename "$0") -d install]                    Install the dependencies located in $HOME/$(basename "$0")/dependencies
+    -d            [$(basename "$0") -d]                            shows this help message.
+    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
+    add           [$(basename "$0") -d add <package name>]         Add dependencies to $HOME/$(basename "$0")/dependencies.
+    install       [$(basename "$0") -d install]                    Install the dependencies located in $HOME/$(basename "$0")/dependencies.
 "
 
+usage_services="
+    Options:      Syntax:                                          Description:
+
+    -s            [$(basename "$0") -s]                            Shows this help message.
+    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the $HOME/$(basename "$0")/services file.
+    start         [$(basename "$0") -s start <service>]            Start the selected service.
+    stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
+    enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
+    disable       [$(basename "$0") -s disable <service>]          Disable the selected service.
+    status        [$(basename "$0") -s status <service>]           Show current service status.
+"
 
 automatic_git () {
   {
@@ -238,9 +248,13 @@ install_dependencies () {
 
 }
 
+
+
+
+
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpuavd' option; do
+while getopts ':-gpuavds' option; do
   case "$option" in
     g)
       if [ -z $2 ]; then
@@ -322,6 +336,26 @@ while getopts ':-gpuavd' option; do
       ;;
     v)
       echo $VERSION
+      ;;
+    s)
+      if [ -z $2 ]; then
+        echo "$form_top $usage_install_dependencies"
+      else
+        case $2 in
+          list)
+            cat ~/.$(basename "$0")/dependencies
+            ;;
+          add)
+            add_dependencies $@
+            ;;
+          clear)
+            echo "" >  ~/.$(basename "$0")/dependencies
+            ;;
+          install)
+            install_dependencies
+            ;;
+        esac
+      fi
       ;;
    \?) echo "illegal option:" "$OPTARG" >&2
        echo "$form_top $usage" >&2
