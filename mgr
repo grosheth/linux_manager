@@ -72,15 +72,15 @@ usage_install_dependencies="
 
     -d            [$(basename "$0") -d]                            shows this help message.
     list          [$(basename "$0") -d list]                       lists the current dependencies to install.
-    add           [$(basename "$0") -d add <package name>]         Add dependencies to $HOME/$(basename "$0")/dependencies.
-    install       [$(basename "$0") -d install]                    Install the dependencies located in $HOME/$(basename "$0")/dependencies.
+    add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
+    install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
 "
 
 usage_services="
     Options:      Syntax:                                          Description:
 
     -s            [$(basename "$0") -s]                            Shows this help message.
-    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the $HOME/$(basename "$0")/services file.
+    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
     start         [$(basename "$0") -s start <service>]            Start the selected service.
     stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
     enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
@@ -339,7 +339,7 @@ while getopts ':-gpuavds' option; do
       ;;
     s)
       if [ -z $2 ]; then
-        echo "$form_top $usage_install_dependencies"
+        echo "$form_top $usage_services"
       else
         case $2 in
           list)
