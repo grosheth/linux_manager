@@ -34,6 +34,7 @@ do
     # removing home folder
     if [[ $number == 2 ]]; then
         steps="removing_folder"
+        # Add verification if ~/.mgr should be removed
         rm -rf $HOME/.mgr
     fi
 
