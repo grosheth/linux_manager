@@ -203,6 +203,9 @@ update_system () {
   fi
 }
 
+# Make one function to populate files (backup_list, dependencies)
+# Use the first argument to determine in which file to add content
+
 add_dependencies () {
   LIST=$@
 
@@ -248,10 +251,32 @@ install_dependencies () {
     fi
 }
 
+# Backup functions todo
+backup_file() {
+
+    backup_list=$(cat ~/.$(basename "$0")/backup/backup_list )
+    # Find how to export bookmarks via CLI
+
+
+    # Loop in repos specified ~/.mgr/backup/backup_list
+
+}
+
+backup_folder() {
+
+    # Find how to export bookmarks via CLI
+
+
+    # Loop in repos specified ~/.mgr/backup/backup_list
+
+}
+
 
 # Services Control functions todo
 
-# Backup functions todo
+
+
+
 
 # -- Execution -- #
 no_args="true"
@@ -355,6 +380,29 @@ while getopts ':-gpuavds' option; do
             ;;
           install)
             install_dependencies
+            ;;
+        esac
+      fi
+      ;;
+    b)
+      if [ -z $2 ]; then
+        echo "$form_top"
+      else
+        case $2 in
+          list)
+            cat ~/.$(basename "$0")/backup_list
+            ;;
+          add)
+            add_dependencies $@
+            ;;
+          clear)
+            echo "" >  ~/.$(basename "$0")/backup_list
+            ;;
+          file)
+            backup_file
+            ;;
+          folder)
+            backup_folder
             ;;
         esac
       fi

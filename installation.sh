@@ -20,7 +20,8 @@ printf "\r ${3} : [${_done// /#}${_left// /-}] ${_progress}%%\n"
 _start=1
 
 # This is the amount of tasks that needs to be done in the installation
-_end=5
+_end=7
+
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -43,14 +44,26 @@ do
         mkdir $HOME/.mgr
     fi
 
-    # Create the dependencies file
+    # Create the backup folder
     if [[ $number == 4 ]]; then
+        steps="Create_backup_folder"
+        mkdir $HOME/.mgr/backup
+    fi
+
+    # Create the file for backups
+    if [[ $number == 5 ]]; then
+        steps="create_backup_file"
+        touch $HOME/.mgr/backup_list
+    fi
+
+    # Create the dependencies file
+    if [[ $number == 6 ]]; then
         steps="Create_folder"
         touch $HOME/.mgr/dependencies
     fi
 
     # Copies mgr binary for local user
-    if [[ $number == 5 ]]; then
+    if [[ $number == 7 ]]; then
         steps="Copying_files"
         cp mgr $HOME/.local/bin
     fi
