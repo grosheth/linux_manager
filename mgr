@@ -279,7 +279,7 @@ install_dependencies () {
 
 backup_location() {
   echo "Please enter full path for backup location"
-  read -n 1 -p "Enter location for backup:" backup_location
+  read -p "Enter location for backup:" backup_location
 
   {
     COMMAND=$(stat ${backup_location})
@@ -299,7 +299,7 @@ backup () {
   backup_list=$(cat ~/.$(basename "$0")/backup_list )
   backup_location=$(cat ~/.$(basename "$0")/backup_location )
 
-  if [ ${backup_location} == "" ]; then
+  if [ -z ${backup_location} ]; then
     backup_location
   fi
 
@@ -315,17 +315,26 @@ backup () {
     else
       echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
     fi
+
+    echo "Backup of ${item} will be created in ${backup_location}"
+
+    cp -R ${item} ${backup_location}
+
+
   done
 
-  # Check if location has space for new backup  
-
-
-
-  cp -R ${item} ${backup_location}
 }
 
 
+export_bookmarks () {
+  test=''
+}
+
 # Services Control functions todo
+
+control_service () {
+  start=''
+}
 
 
 
