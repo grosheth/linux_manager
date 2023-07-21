@@ -22,12 +22,11 @@ usage="
     Options:      Syntax:                                          Description:
 
     -g            [$(basename "$0") -g 'commit message']           Simplify Git commands. Can also use GitHub API.
-    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment and requirements.txt.
-    -a            [$(basename "$0") -a]                            Manages Application can manage some services on systemd. (Needs sudo)
-    -u            [$(basename "$0") -u]                            Updates current System. (Needs sudo)
+    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment.
+    -u            [$(basename "$0") -u]                            Updates current System. (sudo)
     -v            [$(basename "$0") -v]                            Current version of mgr.
-    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (Needs sudo)
-    -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (Needs sudo)
+    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
+    -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
     -b            [$(basename "$0") -b]                            Create backups of selected files or folders
 "
 
@@ -64,7 +63,7 @@ usage_python_venv="
 
     -p            [$(basename "$0") -p]                            shows this help message.
     venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
-    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt.
+    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
 
 "
 
@@ -84,7 +83,7 @@ usage_backup="
     -b            [$(basename "$0") -b]                            Shows this help message.
     add           [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
     list          [$(basename "$0") -b list]                       lists the current backups and its location.
-    location      [$(basename "$0") -b location]                   Change location for backup, if not specified backups will be in ~/$(basename "$0")/backup folder
+    location      [$(basename "$0") -b location]                   Change location for backup.
     clear         [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
     run           [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
     bookmarks     [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
@@ -316,7 +315,7 @@ backup () {
     else
       echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
     fi
-    
+
     current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
     mkdir ${backup_location}/${current_date}
     echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}/${current_date}"
@@ -345,7 +344,7 @@ control_service () {
 # -- Execution -- #
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpuavdsb' option; do
+while getopts ':-gpuvdsb' option; do
   case "$option" in
     g)
       if [ -z $2 ]; then
@@ -444,6 +443,9 @@ while getopts ':-gpuavdsb' option; do
             ;;
           install)
             install_dependencies
+            ;;
+          *)
+            echo "$form_top $usage_services"
             ;;
         esac
       fi
