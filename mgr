@@ -74,6 +74,7 @@ usage_install_dependencies="
     list          [$(basename "$0") -d list]                       lists the current dependencies to install.
     add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
     install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
+    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/dependencies file
 "
 
 usage_services="
@@ -81,18 +82,24 @@ usage_services="
 
     -s            [$(basename "$0") -s]                            Shows this help message.
     add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
+    list          [$(basename "$0") -d list]                       lists the current services managed by $(basename "$0")
     start         [$(basename "$0") -s start <service>]            Start the selected service.
     stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
     enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
     disable       [$(basename "$0") -s disable <service>]          Disable the selected service.
     status        [$(basename "$0") -s status <service>]           Show current service status.
+    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
 "
 
 usage_backup="
     Options:      Syntax:                                          Description:
 
-    -s            [$(basename "$0") -s]                            Shows this help message.
-    add           [$(basename "$0") -s add <service>]              Add file to backup into the ~/$(basename "$0")/backup file.
+    -b            [$(basename "$0") -s]                            Shows this help message.
+    add           [$(basename "$0") -s add <location>]             Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
+    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
+    location      [$(basename "$0") -s location]                   Change location for backup, if not specified backups will be in ~/$(basename "$0")/backup folder
+    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/backup file
+    run           [$(basename "$0") -s run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
 "
 
 
@@ -217,22 +224,20 @@ add_to_list () {
 
   for package in $LIST
   do
-    if [[ *"-"* == ${package} ]]; then
-      case "$package" in
-        -d)
+    case "$package" in
+      -d)
         file="dependencies"
         ;;
-        -s)
+      -s)
         file="services"
         ;;
-        -b)
+      -b)
         file="backup_list"
         ;;
-      esac
-    fi
+    esac
 
-    if [[ ${package} != '-d' && ${package} != 'add' ]]; then
-      echo -e ${package} >> $HOME/.$(basename "$0")/dependencies
+    if [[ ${package} != *'-'* && ${package} != 'add' ]]; then
+      echo -e ${package} >> $HOME/.$(basename "$0")/${file}
     fi
   done
 }
@@ -271,31 +276,48 @@ install_dependencies () {
     fi
 }
 
-# Backup functions todo
-backup_file() {
+backup_location() {
+  echo "Please enter full path for backup location"
+  read -n 1 -p "Enter location for backup:" backup_location
 
-    backup_list=$(cat ~/.$(basename "$0")/backup/backup_list )
-    # Find how to export bookmarks via CLI
+  {
+    COMMAND=$(stat ${backup_location})
+  }
+  CMD_RETURN_CODE=$?
 
-
-    # Loop in repos specified ~/.mgr/backup/backup_list
-
-}
-
-backup_folder() {
-
-    # Find how to export bookmarks via CLI
-  test=''
-
-    # Loop in repos specified ~/.mgr/backup/backup_list
+  if [ $CMD_RETURN_CODE == 0 ]; then
+    >  ~/.$(basename "$0")/backup_location
+    echo ${backup_location} >  ~/.$(basename "$0")/backup_location
+  else
+    echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
+  fi
 
 }
 
 backup () {
-  test=''
+  backup_list=$(cat ~/.$(basename "$0")/backup_list )
+  backup_location=$(cat ~/.$(basename "$0")/backup_location )
 
+  if [ ${backup_location} == "" ]; then
+    backup_location
+  fi
+
+  for item in ${backup_list}
+  do
+    {
+      COMMAND=$(stat ${item})
+    }
+    CMD_RETURN_CODE=$?
+
+    if [ $CMD_RETURN_CODE == 0 ]; then
+      infos="$(stat ${item})"
+    else
+      echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
+    fi
+  done
+
+  cp -R ${item} ${backup_location}
 }
-
 
 
 # Services Control functions todo
@@ -307,7 +329,7 @@ backup () {
 # -- Execution -- #
 no_args="true"
 if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpuavds' option; do
+while getopts ':-gpuavdsb' option; do
   case "$option" in
     g)
       if [ -z $2 ]; then
@@ -376,7 +398,7 @@ while getopts ':-gpuavds' option; do
             add_to_list $@
             ;;
           clear)
-            echo "" >  ~/.$(basename "$0")/dependencies
+            >  ~/.$(basename "$0")/dependencies
             ;;
           install)
             install_dependencies
@@ -402,7 +424,7 @@ while getopts ':-gpuavds' option; do
             add_to_list $@
             ;;
           clear)
-            echo "" >  ~/.$(basename "$0")/services
+            >  ~/.$(basename "$0")/services
             ;;
           install)
             install_dependencies
@@ -422,13 +444,16 @@ while getopts ':-gpuavds' option; do
             add_to_list $@
             ;;
           clear)
-            echo "" >  ~/.$(basename "$0")/backup_list
+            >  ~/.$(basename "$0")/backup_list
             ;;
-          file)
-            backup_file
+          location)
+            backup_location
             ;;
-          folder)
-            backup_folder
+          run)
+            backup
+            ;;
+          *)
+            echo "$form_top $usage_backup"
             ;;
         esac
       fi

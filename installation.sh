@@ -50,10 +50,11 @@ do
         mkdir $HOME/.mgr/backup
     fi
 
-    # Create the file for backups
+    # Create the files for backups
     if [[ $number == 5 ]]; then
         steps="create_backup_file"
         touch $HOME/.mgr/backup_list
+        touch $HOME/.mgr/backup_location
     fi
 
     # Create the file for services
