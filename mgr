@@ -81,12 +81,13 @@ usage_install_dependencies="
 usage_backup="
     Options:      Syntax:                                          Description:
 
-    -b            [$(basename "$0") -s]                            Shows this help message.
-    add           [$(basename "$0") -s add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
-    list          [$(basename "$0") -d list]                       lists the current backups and its location.
-    location      [$(basename "$0") -s location]                   Change location for backup, if not specified backups will be in ~/$(basename "$0")/backup folder
-    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/backup file
-    run           [$(basename "$0") -s run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
+    -b            [$(basename "$0") -b]                            Shows this help message.
+    add           [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
+    list          [$(basename "$0") -b list]                       lists the current backups and its location.
+    location      [$(basename "$0") -b location]                   Change location for backup, if not specified backups will be in ~/$(basename "$0")/backup folder
+    clear         [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
+    run           [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
+    bookmarks     [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
 "
 
 usage_services="
@@ -94,7 +95,7 @@ usage_services="
 
     -s            [$(basename "$0") -s]                            Shows this help message.
     add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
-    list          [$(basename "$0") -d list]                       lists the current services managed by $(basename "$0")
+    list          [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
     start         [$(basename "$0") -s start <service>]            Start the selected service.
     stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
     enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
@@ -315,9 +316,11 @@ backup () {
     else
       echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
     fi
-
-    echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}"
-    cp -R ${item} ${backup_location}
+    
+    current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
+    mkdir ${backup_location}/${current_date}
+    echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}/${current_date}"
+    cp -R ${item} ${backup_location}/${current_date}
 
 
   done
