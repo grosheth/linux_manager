@@ -88,6 +88,15 @@ usage_services="
     status        [$(basename "$0") -s status <service>]           Show current service status.
 "
 
+usage_backup="
+    Options:      Syntax:                                          Description:
+
+    -s            [$(basename "$0") -s]                            Shows this help message.
+    add           [$(basename "$0") -s add <service>]              Add file to backup into the ~/$(basename "$0")/backup file.
+"
+
+
+
 # -- Functions -- #
 
 automatic_git () {
@@ -203,14 +212,25 @@ update_system () {
   fi
 }
 
-# Make one function to populate files (backup_list, dependencies)
-# Use the first argument to determine in which file to add content
-
-add_dependencies () {
+add_to_list () {
   LIST=$@
 
   for package in $LIST
   do
+    if [[ *"-"* == ${package} ]]; then
+      case "$package" in
+        -d)
+        file="dependencies"
+        ;;
+        -s)
+        file="services"
+        ;;
+        -b)
+        file="backup_list"
+        ;;
+      esac
+    fi
+
     if [[ ${package} != '-d' && ${package} != 'add' ]]; then
       echo -e ${package} >> $HOME/.$(basename "$0")/dependencies
     fi
@@ -265,11 +285,17 @@ backup_file() {
 backup_folder() {
 
     # Find how to export bookmarks via CLI
-
+  test=''
 
     # Loop in repos specified ~/.mgr/backup/backup_list
 
 }
+
+backup () {
+  test=''
+
+}
+
 
 
 # Services Control functions todo
@@ -347,7 +373,7 @@ while getopts ':-gpuavds' option; do
             cat ~/.$(basename "$0")/dependencies
             ;;
           add)
-            add_dependencies $@
+            add_to_list $@
             ;;
           clear)
             echo "" >  ~/.$(basename "$0")/dependencies
@@ -373,10 +399,10 @@ while getopts ':-gpuavds' option; do
             cat ~/.$(basename "$0")/dependencies
             ;;
           add)
-            add_dependencies $@
+            add_to_list $@
             ;;
           clear)
-            echo "" >  ~/.$(basename "$0")/dependencies
+            echo "" >  ~/.$(basename "$0")/services
             ;;
           install)
             install_dependencies
@@ -386,14 +412,14 @@ while getopts ':-gpuavds' option; do
       ;;
     b)
       if [ -z $2 ]; then
-        echo "$form_top"
+        echo "$form_top $usage_backup"
       else
         case $2 in
           list)
             cat ~/.$(basename "$0")/backup_list
             ;;
           add)
-            add_dependencies $@
+            add_to_list $@
             ;;
           clear)
             echo "" >  ~/.$(basename "$0")/backup_list
