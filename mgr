@@ -83,7 +83,7 @@ usage_backup="
 
     -b            [$(basename "$0") -s]                            Shows this help message.
     add           [$(basename "$0") -s add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
-    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
+    list          [$(basename "$0") -d list]                       lists the current backups and its location.
     location      [$(basename "$0") -s location]                   Change location for backup, if not specified backups will be in ~/$(basename "$0")/backup folder
     clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/backup file
     run           [$(basename "$0") -s run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
@@ -316,8 +316,7 @@ backup () {
       echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
     fi
 
-    echo "Backup of ${item} will be created in ${backup_location}"
-
+    echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}"
     cp -R ${item} ${backup_location}
 
 
@@ -452,7 +451,7 @@ while getopts ':-gpuavdsb' option; do
       else
         case $2 in
           list)
-            cat ~/.$(basename "$0")/backup_list
+            echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
             ;;
           add)
             add_to_list $@
