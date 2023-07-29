@@ -21,7 +21,7 @@ form_top="
 usage="
     Options:      Syntax:                                          Description:
 
-    -g            [$(basename "$0") -g 'commit message']           Simplify Git commands. Can also use GitHub API.
+    -g            [$(basename "$0") -g 'commit message']           Combines basic Git commands. Can also use GitHub API.
     -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment.
     -u            [$(basename "$0") -u]                            Updates current System. (sudo)
     -v            [$(basename "$0") -v]                            Current version of mgr.
@@ -74,7 +74,7 @@ usage_install_dependencies="
     list          [$(basename "$0") -d list]                       lists the current dependencies to install.
     add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
     install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
-    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/dependencies file
+    clear         [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
 "
 
 usage_backup="
@@ -331,7 +331,6 @@ check_bookmarks () {
   bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
   echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_location}/${current_date}/Brave_bookmarks"
   cp -R $bookmarks_location ${backup_location}/${current_date}/Brave_bookmarks
-\
 }
 
 # Services Control functions todo

@@ -19,19 +19,27 @@ jobs:
 
       - name: Adjust rights on installation script
         run: chmod 755 installation.sh
-
+      
+        # Installation Test
       - name: Execute installation script
         run: bash installation.sh
-
+      
+        # Version Test
       - name: Test mgr version
         run: bash mgr -v
 
+        # Update Test
       - name: Test mgr update
         run: bash mgr -u
 
-      - name: install Python
-        run: sudo apt install python3 && sudo apt install python3-venv
+        # Install Dependencies Test
+      - name: Add Python3 to installation list
+        run: bash mgr -d add python3 python3-venv
 
+      - name: Install Python
+        run: bash mgr -d install
+        
+        # Python Tests
       - name: Test mgr python
         run: bash mgr -p
 
@@ -40,6 +48,13 @@ jobs:
 
       - name: Create a New Python Project
         run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test && cd python-repo-test && ls -la
+
+      - name: pwd
+        run: pwd & ls -la
+
+        # Backup tests
+      - name: Add Path to backup list
+        run: bash mgr -b add ~$HOME/.bashrc 
 
       - name: Test mgr git
         run: bash mgr -g
