@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Get current tags on Repo
-        uses: git tag
+        run: git tag
 
       # - name: Check if current dev version is not already released
       #   run: check current tags on GH
