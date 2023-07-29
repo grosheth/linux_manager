@@ -51,9 +51,6 @@ jobs:
 
         # Backup tests
       - name: Add Path to backup list
-        run: touch $HOME/.bashrc && bash mgr -b add ~$HOME/.bashrc
-
-      - name: Add Path to backup list
         run: bash mgr -b add /home/runner/work/linux_manager/linux_manager/python-test
 
       - name: Create backup
