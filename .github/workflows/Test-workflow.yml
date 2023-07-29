@@ -11,8 +11,8 @@ jobs:
       - name: Get Project on Git
         uses: actions/checkout@v3.5.3
 
-      - name: Get current tags on Repo
-        run: git tag
+      # - name: Get current tags on Repo
+      #   run: git tag
 
       # - name: Check if current dev version is not already released
       #   run: check current tags on GH
@@ -43,4 +43,3 @@ jobs:
 
       - name: Test mgr git
         run: bash mgr -g
-
