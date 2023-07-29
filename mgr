@@ -320,17 +320,26 @@ backup () {
     mkdir ${backup_location}/${current_date}
     echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}/${current_date}"
     cp -R ${item} ${backup_location}/${current_date}
-    check_bookmarks
 
   done
+  backup_bookmarks
 
 }
 
-check_bookmarks () {
-  # Add intelligent check if bookmarks exist or not
+backup_bookmarks () {
   bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
-  echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_location}/${current_date}/Brave_bookmarks"
-  cp -R $bookmarks_location ${backup_location}/${current_date}/Brave_bookmarks
+
+  {
+    COMMAND=$(cat ${bookmarks_location})
+  }
+  CMD_RETURN_CODE=$?
+  
+  if [ $CMD_RETURN_CODE == 0 ]; then
+    echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_location}/${current_date}/Brave_bookmarks"
+    cp -R $bookmarks_location ${backup_location}/${current_date}/Brave_bookmarks
+  else
+    echo -e "${RED}No Bookmarks exists for Brave"
+  fi
 }
 
 # Services Control functions todo
