@@ -11,3 +11,14 @@ jobs:
     steps:
       - name: Get Project on Git
         uses: actions/checkout@v3.5.3
+
+      - name: Adjust rights on installation script
+        run: chmod 755 installation.sh
+      
+        # Installation Test
+      - name: Execute installation script
+        run: bash installation.sh
+
+      - name: Create tag
+        run: bash mgr -g tag
+      
