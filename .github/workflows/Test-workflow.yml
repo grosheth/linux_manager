@@ -43,11 +43,20 @@ jobs:
       - name: Test mgr python
         run: bash mgr -p
 
+      # - name: Create a Python venv
+      #   run: mkdir python-test && cd python-test && bash $HOME/work/linux_manager/linux_manager/mgr -p venv && ls -la
+
+      # - name: Create a New Python Project
+      #   run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test && cd python-repo-test && ls -la
+
       - name: Create a Python venv
-        run: mkdir python-test && cd python-test && bash $HOME/work/linux_manager/linux_manager/mgr -p venv && ls -la
+        run: mkdir python-test && cd python-test && bash mgr -p venv && ls -la
 
       - name: Create a New Python Project
-        run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test && cd python-repo-test && ls -la
+        run: cd ~ && bash mgr -p python-repo-test && cd python-repo-test && ls -la
+
+
+
 
         # Backup tests
       - name: Add Path to backup list
