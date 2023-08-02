@@ -102,9 +102,6 @@ usage_services="
     status        [$(basename "$0") -s status <service>]           Show current service status.
     clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
 "
-
-
-
 # -- Functions -- #
 
 automatic_git () {
@@ -175,7 +172,6 @@ github_init () {
 
   git init
   git remote add $2 git@github.com:$1/$2.git
-
 }
 
 check_system () {
@@ -189,7 +185,6 @@ check_system () {
   else
     SYSTEM=$(cat /etc/os-release)
   fi
-
 }
 
 update_system () {
@@ -292,7 +287,22 @@ backup_location() {
   else
     echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
   fi
+}
 
+backup_bookmarks () {
+  bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
+
+  {
+    COMMAND=$(cat ${bookmarks_location})
+  }
+  CMD_RETURN_CODE=$?
+  
+  if [ $CMD_RETURN_CODE == 0 ]; then
+    echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_folder}"
+    cp -R $bookmarks_location ${backup_folder}/Brave_bookmarks
+  else
+    echo -e "${RED}No Bookmarks exists for Brave"
+  fi
 }
 
 backup () {
@@ -302,6 +312,10 @@ backup () {
   if [ -z ${backup_location} ]; then
     backup_location
   fi
+
+  current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
+  mkdir ${backup_location}/${current_date}
+  backup_folder="${backup_location}/${current_date}"
 
   for item in ${backup_list}
   do
@@ -316,185 +330,188 @@ backup () {
       echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
     fi
 
-    current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
-    mkdir ${backup_location}/${current_date}
-    echo -e "${GREEN}Backup of ${item} will be created in ${backup_location}/${current_date}"
-    cp -R ${item} ${backup_location}/${current_date}
+    echo -e "${GREEN}Backup of ${item} will be created in ${backup_folder}"
+    cp -R ${item} ${backup_folder}
 
   done
   backup_bookmarks
-
 }
-
-backup_bookmarks () {
-  bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
-
-  {
-    COMMAND=$(cat ${bookmarks_location})
-  }
-  CMD_RETURN_CODE=$?
-  
-  if [ $CMD_RETURN_CODE == 0 ]; then
-    echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_location}/${current_date}/Brave_bookmarks"
-    cp -R $bookmarks_location ${backup_location}/${current_date}/Brave_bookmarks
-  else
-    echo -e "${RED}No Bookmarks exists for Brave"
-  fi
-}
-
-# Services Control functions todo
 
 control_service () {
   start=''
 }
 
 
+# -- Logging -- #
+SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
 
+(( ! IMPL_MODE && ! NEST_LVL )) && {
+  export IMPL_MODE=1
+  exec 3>&1 4>&2
+  trap 'exec 2>&4 1>&3' EXIT HUP INT QUIT RETURN
 
+  (
+  (
 
-# -- Execution -- #
-no_args="true"
-if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-gpuvdsb' option; do
-  case "$option" in
-    g)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_git"
-      else
-        case $2 in
-          token)
-            add_github_token
-            ;;
-          repo)
-            if [ -z $3 ]; then
-              echo "$form_top $usage_git_repo"
-            else
-              if [ -z $4 ]; then
-                private="true"
-              else
-                private=$4
-              fi
-              create_github_repo $3 private
-            fi
-            ;;
-          init)
-            if [ -z $3 ]; then
-              echo "$form_top $usage_git_init"
-            else
-              if [ -z $5 ]; then
-                private="true"
-              else
-                private=$5
-              fi
-                github_init $3 $4 private
-            fi
-            ;;
-          *)
-            automatic_git $2
-            ;;
-        esac
-      fi
-      ;;
-    p)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_python_venv"
-      else
-        case $2 in
-          venv)
-            setup_python_venv
-            ;;
-          *)
-            setup_python_project $2
-            ;;
-        esac
-      fi
-      ;;
-    u)
-      update_system
-      ;;
-    d)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_install_dependencies"
-      else
-        case $2 in
-          list)
-            cat ~/.$(basename "$0")/dependencies
-            ;;
-          add)
-            add_to_list $@
-            ;;
-          clear)
-            >  ~/.$(basename "$0")/dependencies
-            ;;
-          install)
-            install_dependencies
-            ;;
-          *)
+    # -- Execution -- #
+    no_args="true"
+    if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
+    while getopts ':-gpuvdsbh' option; do
+      case "$option" in
+        h)
+          if [ -z $2 ]; then
+            echo "$form_top $usage"
+          fi
+          ;;
+        g)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_git"
+          else
+            case $2 in
+              token)
+                add_github_token
+                ;;
+              repo)
+                if [ -z $3 ]; then
+                  echo "$form_top $usage_git_repo"
+                else
+                  if [ -z $4 ]; then
+                    private="true"
+                  else
+                    private=$4
+                  fi
+                  create_github_repo $3 private
+                fi
+                ;;
+              init)
+                if [ -z $3 ]; then
+                  echo "$form_top $usage_git_init"
+                else
+                  if [ -z $5 ]; then
+                    private="true"
+                  else
+                    private=$5
+                  fi
+                    github_init $3 $4 private
+                fi
+                ;;
+              *)
+                automatic_git $2
+                ;;
+            esac
+          fi
+          ;;
+        p)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_python_venv"
+          else
+            case $2 in
+              venv)
+                setup_python_venv
+                ;;
+              *)
+                setup_python_project $2
+                ;;
+            esac
+          fi
+          ;;
+        u)
+          update_system
+          ;;
+        d)
+          if [ -z $2 ]; then
             echo "$form_top $usage_install_dependencies"
-            ;;
-        esac
-      fi
-      ;;
-    v)
-      echo $VERSION
-      ;;
-    s)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_services"
-      else
-        case $2 in
-          list)
-            cat ~/.$(basename "$0")/dependencies
-            ;;
-          add)
-            add_to_list $@
-            ;;
-          clear)
-            >  ~/.$(basename "$0")/services
-            ;;
-          install)
-            install_dependencies
-            ;;
-          *)
+          else
+            case $2 in
+              list)
+                cat ~/.$(basename "$0")/dependencies
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/dependencies
+                ;;
+              install)
+                install_dependencies
+                ;;
+              *)
+                echo "$form_top $usage_install_dependencies"
+                ;;
+            esac
+          fi
+          ;;
+        v)
+          echo $VERSION
+          ;;
+        s)
+          if [ -z $2 ]; then
             echo "$form_top $usage_services"
-            ;;
-        esac
-      fi
-      ;;
-    b)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_backup"
-      else
-        case $2 in
-          list)
-            echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
-            ;;
-          add)
-            add_to_list $@
-            ;;
-          clear)
-            >  ~/.$(basename "$0")/backup_list
-            ;;
-          location)
-            backup_location
-            ;;
-          run)
-            backup
-            ;;
-          *)
+          else
+            case $2 in
+              list)
+                cat ~/.$(basename "$0")/dependencies
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/services
+                ;;
+              install)
+                install_dependencies
+                ;;
+              *)
+                echo "$form_top $usage_services"
+                ;;
+            esac
+          fi
+          ;;
+        b)
+          if [ -z $2 ]; then
             echo "$form_top $usage_backup"
-            ;;
-        esac
-      fi
-      ;;
-   \?) echo "illegal option:" "$OPTARG" >&2
-       echo "$form_top $usage" >&2
-       exit 1
-       ;;
-  esac
-  no_args="false"
-done
+          else
+            case $2 in
+              list)
+                echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/backup_list
+                ;;
+              location)
+                backup_location
+                ;;
+              run)
+                backup
+                ;;
+              *)
+                echo "$form_top $usage_backup"
+                ;;
+            esac
+          fi
+          ;;
+      \?) echo "illegal option:" "$OPTARG" >&2
+          echo "$form_top $usage" >&2
+          exit 1
+          ;;
+      esac
+      no_args="false"
+    done
+
+    exec $0 "$@"
+  ) | tee -a "${HOME}/.mgr/logs/log.out" 2>&1
+  ) 1>&3 2>&4
+
+  exit $?
+}
+
+(( NEST_LVL++ ))
+
 
 [ -d ~/.$(basename "$0") ] || mkdir ~/.$(basename "$0")
 [[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
 shift "$(($OPTIND-1))"
+

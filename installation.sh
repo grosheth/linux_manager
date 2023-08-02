@@ -48,6 +48,7 @@ do
     if [[ $number == 4 ]]; then
         steps="Create_backup_folder"
         mkdir $HOME/.mgr/backup
+        mkdir $HOME/.mgr/logs
     fi
 
     # Create the files for backups
@@ -55,6 +56,7 @@ do
         steps="create_backup_file"
         touch $HOME/.mgr/backup_list
         touch $HOME/.mgr/backup_location
+        touch $HOME/.mgr/logs/log.out
         echo ${HOME}/.mgr/backup > ${HOME}/.mgr/backup_location
     fi
 
