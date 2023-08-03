@@ -490,7 +490,9 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           else
             case $2 in
               list)
+                ## Could make a clean output function for this ##
                 echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
+                ## Could make a clean output function for this ##
                 ;;
               add)
                 add_to_list $@
