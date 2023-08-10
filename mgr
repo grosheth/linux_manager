@@ -350,7 +350,30 @@ backup () {
 }
 
 control_service () {
-  start=''
+  services_list=$(cat ~/.$(basename "$0")/services )
+  LIST=$@
+
+  #Check if one service is specified, if not apply to all services
+
+  for option in $LIST
+  do
+    case "$package" in
+      start)
+        sudo systemctl start 
+        ;;
+      stop)
+        file="services"
+        ;;
+      enable)
+        file="backup_list"
+        ;;
+      disable)
+        file="dependencies"
+        ;;
+      status)
+        file="services"
+        ;;
+    esac
 }
 
 
@@ -467,7 +490,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           else
             case $2 in
               list)
-                cat ~/.$(basename "$0")/dependencies
+                cat ~/.$(basename "$0")/services
                 ;;
               add)
                 add_to_list $@
@@ -475,8 +498,20 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
               clear)
                 >  ~/.$(basename "$0")/services
                 ;;
-              install)
-                install_dependencies
+              start)
+                control_service $@
+                ;;
+              stop)
+                control_service $@
+                ;;
+              enable)
+                control_service $@
+                ;;
+              disable)
+                control_service $@
+                ;;
+              status)
+                control_service $@
                 ;;
               *)
                 echo "$form_top $usage_services"
