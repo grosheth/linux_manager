@@ -1,68 +1,123 @@
 #!/bin/bash
 
-# Colors
-BLACK='\033[1;30m'
-RED='\033[1;31m'
-GREEN='\033[1;32m'
-CYAN='\033[1;33m'
-BLUE='\033[1;34m'
-YELLOW='\033[1;36m'
-WHITE='\033[1;37m'
-LIGHT_GREEN='\033[0;32m'
+# -- Version -- #
+get_version () {
+  {
+      VERSION=$(cat ~/.mgr/VERSION)
+  }
+  CMD_RETURN_CODE=$?
 
+  if [ -z ${VERSION} ]; then
+    VERSION="0.0.0"
+  fi
+  echo $VERSION
+}
+VERSION=$(cat ~/.mgr/VERSION)
 
+# -- Colors -- #
+BLACK='\033[0;30m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+CYAN='\033[0;33m'
+BLUE='\033[0;34m'
+YELLOW='\033[0;36m'
+WHITE='\033[0;37m'
+
+# -- Help -- #
 form_top="
-  linux_manager -- $(basename "$0") -- Automate common programming tasks on Linux
+  linux_manager -- $(basename "$0") $VERSION -- Automate common tasks on Linux
 
 "
 
 usage="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
-    -h            [mgr -h]                            show this help text
-    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory. Also uses the Github API
-    -p            [mgr -p]                            Creates a project folder with Python virtual Environment and requirements.txt
-
+    -g            [$(basename "$0") -g 'commit message']           Combines basic Git commands. Can also use GitHub API.
+    -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment.
+    -u            [$(basename "$0") -u]                            Updates current System. (sudo)
+    -v            [$(basename "$0") -v]                            Current version of mgr.
+    -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
+    -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
+    -b            [$(basename "$0") -b]                            Create backups of selected files or folders
 "
 
 usage_git="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
-    -g            [mgr -g 'commit message']           Git add,commit, and push to Git in the current directory.
-    token         [mgr -g token]                      Creates a environment var with your Token to call the Github API
-    repo          [mgr -g repo]                       Creates a repo on Github
-    init          [mgr -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
-
+    -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
+    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
+    tag           [$(basename "$0") -g tag <patch,minor,major>]    Creates a Tag on the latest commit with current $(basename "$0") Version.
+    tag_check     [$(basename "$0") -g tag_check]                  Check if a tag exists on the repo. Used in for Github actions pipeline.
+    repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
+    init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 "
 usage_git_repo="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
-    repo          [mgr -g repo name private]          Creates a repo on Github
-    name          [mgr -g repo newproject private]    Name of the repo you want to create
-    private       [mgr -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private
+    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github.
+    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create.
+    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private.
 
 "
 
 usage_git_init="
-    Options:      Syntax:                               Description:
+    Options:      Syntax:                                            Description:
 
-    init          [mgr -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
-    user          [mgr -g init user name private]       Your Github username.
-    name          [mgr -g init user project private]    Name of the repo you want to create
-    private       [mgr -g init user project true]       Bool 'true' or 'false' to set the repo public or private
+    init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
+    user          [$(basename "$0") -g init user name private]       Your Github username.
+    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create.
+    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private.
 
 "
 
 usage_python_venv="
-    Options:      Syntax:                             Description:
+    Options:      Syntax:                                          Description:
 
-    -p            [mgr -p]                            shows this help message
-    venv          [mgr -p venv]                       Creates a Python virtual Environment and requirements.txt
-    <name>        [mgr -p projectname]                Creates a project folder with Python virtual Environment and requirements.txt
+    -p            [$(basename "$0") -p]                            shows this help message.
+    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
+    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
 
 "
 
+usage_install_dependencies="
+    Options:      Syntax:                                          Description:
+
+    -d            [$(basename "$0") -d]                            shows this help message.
+    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
+    add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
+    install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
+    clear         [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
+"
+
+usage_backup="
+    Options:      Syntax:                                          Description:
+
+    -b            [$(basename "$0") -b]                            Shows this help message.
+    add           [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
+    list          [$(basename "$0") -b list]                       lists the current backups and its location.
+    location      [$(basename "$0") -b location]                   Change location for backup.
+    clear         [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
+    run           [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
+    bookmarks     [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
+"
+
+usage_services="
+    Options:      Syntax:                                          Description:
+
+    -s            [$(basename "$0") -s]                            Shows this help message.
+    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
+    list          [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
+    start         [$(basename "$0") -s start <service>]            Start the selected service.
+    stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
+    enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
+    disable       [$(basename "$0") -s disable <service>]          Disable the selected service.
+    status        [$(basename "$0") -s status <service>]           Show current service status.
+    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
+"
+# -- Functions -- #
+
 automatic_git () {
+  # Could be more complete, better error catching
   {
       COMMAND=$(git add .)
   }
@@ -72,13 +127,96 @@ automatic_git () {
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}Failed"
-        git add .
+        exit 1
     else
-      echo -e "${LIGHT_GREEN}Success ${WHITE}"
+      echo -e "${GREEN}Success ${WHITE}"
       git add . && git commit -m "${STRING}" && git push
     fi
 }
 
+check_tag () {
+  tag_list=$(git tag)
+  for tag in $tag_list
+  do
+    if [[ ${tag} == ${VERSION} ]];then
+      echo -e "${GREEN}The tag ${VERSION} is created "
+      exit 0
+    else
+      echo -e "${RED}The tag ${VERSION} is not created "
+      exit 1
+    fi
+  done
+}
+
+git_bump_patch () {
+  patch="${VERSION#*.}"
+  patch="${patch#*.}"
+  
+  if [ $patch == 9 ]; then
+    git_bump_minor
+  else
+    patch=$((patch+1))
+    VERSION=${VERSION%?}$patch
+  fi
+}
+
+git_bump_minor () {
+  patch=0
+  minor="${VERSION#*.}"
+  minor="${minor:0:1}"
+  major="${VERSION%.*}"
+  major="${major%.*}"
+
+  if [ $minor == 9 ]; then
+    git_bump_major
+  else
+    minor=$((minor+1))
+    VERSION=$major.$minor.$patch
+  fi
+}
+
+git_bump_major () {
+  patch=0
+  minor=0
+  major="${VERSION%.*}"
+  major="${major%.*}"
+  major=$((major+1))
+  VERSION=$major.$minor.$patch
+}
+
+# Make this feature universal, currently only works with this repo
+git_tag () {
+  {
+      COMMAND=$(git add .)
+  }
+  CMD_RETURN_CODE=$?
+
+  if [ ${CMD_RETURN_CODE} == 0 ]; then
+
+    # $LIST variable is created before calling this function
+    for bump in $LIST; do
+      case "$bump" in
+        patch)
+          git_bump_patch
+          ;;
+        minor)
+          git_bump_minor
+          ;;
+        major)
+          git_bump_major
+          ;;
+      esac
+    done
+    
+    git tag $VERSION HEAD
+    git push origin $VERSION
+    echo $VERSION > ~/.$(basename "$0")/VERSION
+
+  else
+    echo -e "${RED}You must be in the mgr git folder to upgrade this projects version"
+    exit 1
+  fi
+}
 
 setup_python_venv () {
   python3 -m venv .venv
@@ -104,12 +242,11 @@ add_github_token () {
   echo $github_token > ~/.mgr/token
 }
 
-
 create_github_repo () {
-  if [ ! -f ~/.mgr/token ]; then
+  if [ ! -f ~/.$(basename "$0")/token ]; then
     add_github_token
   fi
-  TOKEN=$(cat ~/.mgr/token)
+  TOKEN=$(cat ~/.$(basename "$0")/token)
   curl \
     -X POST \
     -H "Accept: application/vnd.github+json" \
@@ -118,10 +255,9 @@ create_github_repo () {
     https://api.github.com/user/repos
 }
 
-
 github_init () {
 
-  [ -f ~/.mgr/token ] || add_github_token
+  [ -f ~/.$(basename "$0")/token ] || add_github_token
   TOKEN=$(cat ~/.mgr/token)
   COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
 
@@ -131,78 +267,405 @@ github_init () {
 
   git init
   git remote add $2 git@github.com:$1/$2.git
-
 }
 
+check_system () {
+  {
+      COMMAND=$(cat /etc/os-release)
+  }
+  CMD_RETURN_CODE=$?
 
-no_args="true"
-if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
-while getopts ':-hgp' option; do
-  case "$option" in
-    h) echo "$form_top $usage"
-       exit
-       ;;
-    g)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_git"
-      else
-        case $2 in
-          token)
-            add_github_token
-            ;;
-          repo)
-            if [ -z $3 ]; then
-              echo "$form_top $usage_git_repo"
-            else
-              if [ -z $4 ]; then
-                private="true"
-              else
-                private=$4
-              fi
-              create_github_repo $3 private
-            fi
-            ;;
-          init)
-            if [ -z $3 ]; then
-              echo "$form_top $usage_git_init"
-            else
-              if [ -z $5 ]; then
-                private="true"
-              else
-                private=$5
-              fi
-                github_init $3 $4 private
-            fi
-            ;;
-          *)
-            automatic_git $2
-            ;;
-        esac
-      fi
-      ;;
-    p)
-      if [ -z $2 ]; then
-        echo "$form_top $usage_python_venv"
-      else
-        case $2 in
-          venv)
-            setup_python_venv
-            ;;
-          *)
-            setup_python_project $2
-            ;;
-        esac
-      fi
-      ;;
-   \?) echo "illegal option:" "$OPTARG" >&2
-       echo "$form_top $usage" >&2
-       exit 1
-       ;;
-  esac
-  no_args="false"
-done
+  if [ $CMD_RETURN_CODE != 0 ]; then
+    echo -e "${RED}No os-release file was found on the server"
+    exit 1
+  else
+    SYSTEM=$(cat /etc/os-release)
+  fi
+}
 
-[ -d ~/.mgr ] || mkdir ~/.mgr
+update_system () {
+  check_system
+
+  if [ -z $SYSTEM ]; then
+    echo "make sure /etc/os-release file or symbolic link exists"
+  else
+
+    if [[ $SYSTEM == *"arch"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo pacman -Syu --noconfirm
+    fi
+
+    if [[ $SYSTEM == *"debian"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo apt-get update && sudo apt-get upgrade -y
+    fi
+
+    if [[ $SYSTEM == *"fedora"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
+      sleep 0.1
+      sudo dnf upgrade -y
+    fi
+
+  fi
+}
+
+add_to_list () {
+  LIST=$@
+
+  for package in $LIST; do
+    case "$package" in
+      -d)
+        file="dependencies"
+        ;;
+      -s)
+        file="services"
+        ;;
+      -b)
+        file="backup_list"
+        ;;
+    esac
+
+    if [[ ${package} != *'-'* && ${package} != 'add' ]]; then
+      echo -e ${package} >> $HOME/.$(basename "$0")/${file}
+    fi
+  done
+}
+
+install_dependencies () {
+  check_system
+
+    PACKAGE_LIST=$(cat $HOME/.$(basename "$0")/dependencies)
+
+    if [[ $SYSTEM == *"arch"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Arch based \n ${WHITE}"
+      
+      for package in $PACKAGE_LIST; do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo pacman -S ${package} --noconfirm
+      done
+    fi
+
+    if [[ $SYSTEM == *"debian"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Debian based \n${WHITE}"
+      for package in $PACKAGE_LIST; do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo apt-get install ${package}  -y
+      done
+    fi
+
+    if [[ $SYSTEM == *"fedora"* ]]; then
+      echo -e "${GREEN}According to os-release, your system is Fedora \n ${WHITE}"
+      for package in $PACKAGE_LIST; do
+        echo -e "${GREEN}Installing ${package} ${WHITE}"
+        sudo dnf install ${package} -y
+      done
+    fi
+}
+
+backup_location() {
+  echo "Please enter full path for backup location"
+  read -p "Enter location for backup:" backup_location
+
+  {
+    COMMAND=$(stat ${backup_location})
+  }
+  CMD_RETURN_CODE=$?
+
+  if [ $CMD_RETURN_CODE == 0 ]; then
+    >  ~/.$(basename "$0")/backup_location
+    echo ${backup_location} >  ~/.$(basename "$0")/backup_location
+  else
+    echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
+    exit 1
+  fi
+}
+
+backup_bookmarks () {
+  bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
+
+  {
+    COMMAND=$(cat ${bookmarks_location})
+  }
+  CMD_RETURN_CODE=$?
+  
+  if [ $CMD_RETURN_CODE == 0 ]; then
+    echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_folder}"
+    cp -R $bookmarks_location ${backup_folder}/Brave_bookmarks
+  else
+    echo -e "${RED}No Bookmarks exists for Brave"
+  fi
+}
+
+backup () {
+  backup_list=$(cat ~/.$(basename "$0")/backup_list )
+  backup_location=$(cat ~/.$(basename "$0")/backup_location )
+
+  if [ -z ${backup_location} ]; then
+    backup_location
+  fi
+
+  current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
+  mkdir ${backup_location}/${current_date}
+  backup_folder="${backup_location}/${current_date}"
+
+  for item in ${backup_list}; do
+    {
+      COMMAND=$(stat ${item})
+    }
+    CMD_RETURN_CODE=$?
+
+    if [ $CMD_RETURN_CODE == 0 ]; then
+      infos="$(stat ${item})"
+    else
+      echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
+    fi
+
+    echo -e "${GREEN}Backup of ${item} will be created in ${backup_folder}"
+    cp -R ${item} ${backup_folder}
+
+  done
+  backup_bookmarks
+}
+
+control_service () {
+  services_list=$(cat ~/.$(basename "$0")/services )
+  LIST=$@
+
+  #Check if one service is specified, if not apply to all services
+  if [[ -z ${services_list} ]]; then
+    echo -e "${RED}Aucun services n'est gerer par $(basename "$0"), use this command to add one: $(basename "$0") -s add servicename "
+    exit 1
+  fi
+
+  for service in $LIST; do
+    for managed_service in $services_list; do
+      if [ ${service} == ${managed_service} ]; then
+        SERVICE=$service
+      fi
+    done
+  done
+
+  if [[ -z ${SERVICE} ]]; then
+    SERVICE=$services_list
+  fi
+
+  for action in $LIST; do
+    case $action in
+      start)
+        sudo systemctl start $SERVICE
+        ;;
+      stop)
+        sudo systemctl stop $SERVICE
+        ;;
+      enable)
+        sudo systemctl enable $SERVICE
+        ;;
+      disable)
+        sudo systemctl disable $SERVICE
+        ;;
+      status)
+        sudo systemctl status $SERVICE
+        ;;
+    esac
+  done
+}
+
+# -- Logging -- #
+SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
+currentdate=$(echo $(date '+%Y-%m-%d'))
+
+
+(( ! IMPL_MODE && ! NEST_LVL )) && {
+  export IMPL_MODE=1
+  exec 3>&1 4>&2
+  trap 'exec 2>&4 1>&3' EXIT HUP INT QUIT RETURN
+
+  (
+  (
+
+    # -- Execution -- #
+    no_args="true"
+    if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
+    while getopts ':-gpuvdsbh' option; do
+      case "$option" in
+        h)
+          if [ -z $2 ]; then
+            echo "$form_top $usage"
+          fi
+          ;;
+        g)
+          LIST=$@
+          if [ -z $2 ]; then
+            echo "$form_top $usage_git"
+          else
+            case $2 in
+              token)
+                add_github_token
+                ;;
+              tag)
+                git_tag
+                ;;
+              repo)
+                if [ -z $3 ]; then
+                  echo "$form_top $usage_git_repo"
+                else
+                  if [ -z $4 ]; then
+                    private="true"
+                  else
+                    private=$4
+                  fi
+                  create_github_repo $3 private
+                fi
+                ;;
+              init)
+                if [ -z $3 ]; then
+                  echo "$form_top $usage_git_init"
+                else
+                  if [ -z $5 ]; then
+                    private="true"
+                  else
+                    private=$5
+                  fi
+                    github_init $3 $4 private
+                fi
+                ;;
+              tag_check)
+                check_tag
+                ;;
+              *)
+                automatic_git $2
+                ;;
+            esac
+          fi
+          ;;
+        p)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_python_venv"
+          else
+            case $2 in
+              venv)
+                setup_python_venv
+                ;;
+              *)
+                setup_python_project $2
+                ;;
+            esac
+          fi
+          ;;
+        u)
+          update_system
+          ;;
+        d)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_install_dependencies"
+          else
+            case $2 in
+              list)
+                cat ~/.$(basename "$0")/dependencies
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/dependencies
+                ;;
+              install)
+                install_dependencies
+                ;;
+              *)
+                echo "$form_top $usage_install_dependencies"
+                ;;
+            esac
+          fi
+          ;;
+        v)
+          get_version
+          ;;
+        s)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_services"
+          else
+            case $2 in
+              list)
+                cat ~/.$(basename "$0")/services
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/services
+                ;;
+              start)
+                control_service $@
+                ;;
+              stop)
+                control_service $@
+                ;;
+              enable)
+                control_service $@
+                ;;
+              disable)
+                control_service $@
+                ;;
+              status)
+                control_service $@
+                ;;
+              *)
+                echo "$form_top $usage_services"
+                ;;
+            esac
+          fi
+          ;;
+        b)
+          if [ -z $2 ]; then
+            echo "$form_top $usage_backup"
+          else
+            case $2 in
+              list)
+                ## Could make a clean output function for this ##
+                echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
+                ## Could make a clean output function for this ##
+                ;;
+              add)
+                add_to_list $@
+                ;;
+              clear)
+                >  ~/.$(basename "$0")/backup_list
+                ;;
+              location)
+                backup_location
+                ;;
+              run)
+                backup
+                ;;
+              *)
+                echo "$form_top $usage_backup"
+                ;;
+            esac
+          fi
+          ;;
+      \?) echo "illegal option:" "$OPTARG" >&2
+          echo "$form_top $usage" >&2
+          exit 1
+          ;;
+      esac
+      no_args="false"
+    done
+
+    exec $0 "$@"
+  ) | tee -a "${HOME}/.mgr/logs/log${currentdate}.out" 2>&1
+  ) 1>&3 2>&4
+
+  exit $?
+}
+
+(( NEST_LVL++ ))
+
+
+[ -d ~/.$(basename "$0") ] || mkdir ~/.$(basename "$0")
 [[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
 shift "$(($OPTIND-1))"
 
+exit 0

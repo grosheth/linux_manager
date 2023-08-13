@@ -1,0 +1,90 @@
+name: Test Workflow
+run-name: Tests
+on: 
+  push:
+    branches:
+      - dev
+jobs:
+  Dev-Branch-Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Project on Git
+        uses: actions/checkout@v3.5.3
+
+      - name: Adjust rights on installation script
+        run: chmod 755 installation.sh
+      
+        # Installation Test
+      - name: Execute installation script
+        run: bash installation.sh
+      
+        # Version Test
+      - name: Test mgr version
+        run: bash mgr -v
+
+        # Update Test
+      - name: Test mgr update
+        run: bash mgr -u
+
+        # Install Dependencies Test
+      - name: Add Python3 to installation list
+        run: bash mgr -d add python3 python3-venv
+
+      - name: Install Python
+        run: bash mgr -d install
+        
+        # Python Tests
+      - name: Test mgr python
+        run: bash mgr -p
+
+      - name: Create a Python venv
+        run: mkdir python-test && cd python-test && bash $HOME/work/linux_manager/linux_manager/mgr -p venv && ls -la
+
+      - name: Create a New Python Project
+        run: cd ~ && bash $HOME/work/linux_manager/linux_manager/mgr -p python-repo-test && cd python-repo-test && ls -la
+
+        # Backup tests
+      - name: Add Path to backup list
+        run: bash mgr -b add /home/runner/work/linux_manager/linux_manager/python-test
+
+      - name: Create backup
+        run: bash mgr -b run
+
+        # Git tests
+      - name: Test mgr git
+        run: bash mgr -g
+
+        # Services test
+        # Make custom service
+      # - name: Unmask and recreate docker.service
+      #   run: sudo systemctl start docker
+        
+      # - name: Test mgr services
+      #   run: bash mgr -s
+
+      # - name: Test adding a service
+      #   run: bash mgr -s add docker
+
+      # - name: Test service start
+      #   run: bash mgr -s start docker
+
+      # - name: check service status
+      #   run: bash mgr -s status docker
+
+      # - name: Test service stop
+      #   run: bash mgr -s stop docker
+
+      # - name: check service status
+      #   run: bash mgr -s status docker
+
+      # - name: Test service enable
+      #   run: bash mgr -s enable docker
+
+      # - name: check service status
+      #   run: bash mgr -s status docker
+
+      # - name: Test service disable
+      #   run: bash mgr -s disable docker
+
+      # - name: check service status
+      #   run: bash mgr -s status docker

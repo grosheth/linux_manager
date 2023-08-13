@@ -1,0 +1,23 @@
+name: Test Workflow
+run-name: Test Workflow
+on: 
+  pull_request:
+    branches:
+      - main
+      - master
+jobs:
+  Deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Project on Git
+        uses: actions/checkout@v3.5.3
+
+      - name: Adjust rights on installation script
+        run: chmod 755 installation.sh
+      
+      - name: Execute installation script
+        run: bash installation.sh
+
+      - name: Make sure new version is tagged
+        run: bash mgr -g tag_check
+      
