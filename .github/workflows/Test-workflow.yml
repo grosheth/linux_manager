@@ -65,28 +65,29 @@ jobs:
         run: bash mgr -s
 
       - name: Tester l'ajout de services a controller
-        run: bash -s add docker
+        run: bash mgr -s add docker
 
       - name: Test service startup
-        run: bash -s start docker
+        run: bash mgr -s start docker
 
       - name: check service status
-        run: bash -s status docker
+        run: bash mgr -s status docker
 
       - name: Test service stop
-        run: bash -s stop docker
+        run: bash mgr -s stop docker
 
       - name: check service status
-        run: bash -s status docker
+        run: bash mgr -s status docker
 
       - name: Test service enable
-        run: bash -s enable docker
+        run: bash mgr -s enable docker
 
       - name: check service status
-        run: bash -s status docker
+        run: bash mgr -s status docker
 
       - name: Test service disable
-        run: bash -s disable docker
+        run: bash mgr -s disable docker
 
       - name: check service status
-        run: bash -s status docker
+        run: bash mgr -s status docker
+
