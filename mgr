@@ -12,7 +12,7 @@ get_version () {
   fi
   echo $VERSION
 }
-
+VERSION=$(cat ~/.mgr/VERSION)
 
 # -- Colors -- #
 BLACK='\033[0;30m'
