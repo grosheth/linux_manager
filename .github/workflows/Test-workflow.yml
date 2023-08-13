@@ -61,8 +61,8 @@ jobs:
         run: bash mgr -g
 
         # Services test
-      - name: Unmask Docker service to test
-        run: sudo systemctl unmask docker
+      - name: Unmask and recreate docker.service
+        run: sudo systemctl unmask docker && sudo systemctl start docker
         
       - name: Test mgr services
         run: bash mgr -s
