@@ -15,7 +15,6 @@ jobs:
       - name: Adjust rights on installation script
         run: chmod 755 installation.sh
       
-        # Installation Test
       - name: Execute installation script
         run: bash installation.sh
 

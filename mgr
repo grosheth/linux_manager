@@ -1,7 +1,18 @@
 #!/bin/bash
 
 # -- Version -- #
-VERSION="0.0.0"
+get_version () {
+  {
+      VERSION=$(cat ~/.mgr/VERSION)
+  }
+  CMD_RETURN_CODE=$?
+
+  if [ -z ${VERSION} ]; then
+    VERSION="0.0.0"
+  fi
+  echo $VERSION
+}
+
 
 # -- Colors -- #
 BLACK='\033[0;30m'
@@ -124,13 +135,15 @@ automatic_git () {
 }
 
 check_tag () {
-  echo -e "checking tags"
   tag_list=$(git tag)
-  for tag in tag_list
+  for tag in $tag_list
   do
-    if [ ${tag} == ${VERSION} ];then
-      echo -e "The tag ${VERSION} is created, "
+    if [[ ${tag} == ${VERSION} ]];then
+      echo -e "${GREEN}The tag ${VERSION} is created "
       exit 0
+    else
+      echo -e "${RED}The tag ${VERSION} is not created "
+      exit 1
     fi
   done
 }
@@ -568,7 +581,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         v)
-          echo $VERSION
+          get_version
           ;;
         s)
           if [ -z $2 ]; then

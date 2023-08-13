@@ -20,7 +20,7 @@ printf "\r ${3} : [${_done// /#}${_left// /-}] ${_progress}%%\n"
 _start=1
 
 # This is the amount of tasks that needs to be done in the installation
-_end=9
+_end=8
 
 
 # Proof of concept
@@ -78,14 +78,10 @@ do
         cp mgr $HOME/.local/bin
     fi
 
-    # Create the version file
-    if [[ $number == 9 ]]; then
-        steps="Create_version_file"
-        mgr -v > $HOME/.mgr/VERSION
-    fi
-
 	ProgressBar ${number} ${_end} ${steps}
 done
+
+mgr -v > $HOME/.mgr/VERSION
 
 {
     COMMAND=$(which mgr)
