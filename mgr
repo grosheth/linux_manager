@@ -14,7 +14,7 @@ WHITE='\033[0;37m'
 
 # -- Help -- #
 form_top="
-  linux_manager -- $(basename "$0") $VERSION -- Automate common programming tasks on Linux
+  linux_manager -- $(basename "$0") $VERSION -- Automate common tasks on Linux
 
 "
 
@@ -116,7 +116,7 @@ automatic_git () {
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
         echo -e "${RED}Failed"
-        git add .
+        exit 1
     else
       echo -e "${GREEN}Success ${WHITE}"
       git add . && git commit -m "${STRING}" && git push
@@ -194,6 +194,7 @@ check_system () {
 
   if [ $CMD_RETURN_CODE != 0 ]; then
     echo -e "${RED}No os-release file was found on the server"
+    exit 1
   else
     SYSTEM=$(cat /etc/os-release)
   fi
@@ -298,6 +299,7 @@ backup_location() {
     echo ${backup_location} >  ~/.$(basename "$0")/backup_location
   else
     echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
+    exit 1
   fi
 }
 
@@ -354,26 +356,45 @@ control_service () {
   LIST=$@
 
   #Check if one service is specified, if not apply to all services
+  if [[ -z ${services_list} ]]; then
+    echo -e "${RED}Aucun services n'est gerer par $(basename "$0"), use this command to add one: $(basename "$0") -s add servicename "
+    exit 1
+  fi
 
-  for option in $LIST
+  for service in $LIST
   do
-    case "$package" in
+    for managed_service in $services_list
+    do
+      if [ ${service} == ${managed_service} ]; then
+        SERVICE=$service
+      fi
+    done
+  done
+
+  if [[ -z ${SERVICE} ]]; then
+    SERVICE=$services_list
+  fi
+
+  for action in $LIST
+  do
+    case $action in
       start)
-        sudo systemctl start 
+        sudo systemctl start $SERVICE
         ;;
       stop)
-        file="services"
+        sudo systemctl stop $SERVICE
         ;;
       enable)
-        file="backup_list"
+        sudo systemctl enable $SERVICE
         ;;
       disable)
-        file="dependencies"
+        sudo systemctl disable $SERVICE
         ;;
       status)
-        file="services"
+        sudo systemctl status $SERVICE
         ;;
     esac
+  done
 }
 
 
@@ -569,3 +590,4 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
 [[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
 shift "$(($OPTIND-1))"
 
+exit 0
