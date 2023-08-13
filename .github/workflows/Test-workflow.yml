@@ -34,7 +34,7 @@ jobs:
 
         # Install Dependencies Test
       - name: Add Python3 to installation list
-        run: bash mgr -d add python3 python3-venv
+        run: bash mgr -d add python3 python3-venv docker
 
       - name: Install Python
         run: bash mgr -d install
@@ -61,4 +61,32 @@ jobs:
         run: bash mgr -g
 
         # Services test
-        
+      - name: Test mgr services
+        run: bash mgr -s
+
+      - name: Tester l'ajout de services a controller
+        run: bash -s add docker
+
+      - name: Test service startup
+        run: bash -s start docker
+
+      - name: check service status
+        run: bash -s status docker
+
+      - name: Test service stop
+        run: bash -s stop docker
+
+      - name: check service status
+        run: bash -s status docker
+
+      - name: Test service enable
+        run: bash -s enable docker
+
+      - name: check service status
+        run: bash -s status docker
+
+      - name: Test service disable
+        run: bash -s disable docker
+
+      - name: check service status
+        run: bash -s status docker
