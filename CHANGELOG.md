@@ -1,5 +1,6 @@
-
 # 1.0.0
+
+### New Features
 
 - installation / uninstall scripts
 - Backups function
@@ -9,4 +10,5 @@
 - Update System function
 - Github actions
 - Version function
-  
+
+---
