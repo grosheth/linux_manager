@@ -429,6 +429,11 @@ backup () {
   backup_bookmarks
 }
 
+list_backup () {
+  echo -e "${GREEN}Stuff to backup: ${WHITE}" && cat ~/.$(basename "$0")/backup_list
+  echo -e "${GREEN}Backup location: ${WHITE}" && cat ~/.$(basename "$0")/backup_location
+}
+
 control_service () {
   services_list=$(cat ~/.$(basename "$0")/services )
   LIST=$@
@@ -624,9 +629,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           else
             case $2 in
               list)
-                ## Could make a clean output function for this ##
-                echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
-                ## Could make a clean output function for this ##
+                list_backup
                 ;;
               add)
                 add_to_list $@
