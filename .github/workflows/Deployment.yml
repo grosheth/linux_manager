@@ -1,7 +1,7 @@
 name: Test Workflow
 run-name: Test Workflow
 on: 
-  push:
+  pull_request:
     branches:
       - main
       - master
@@ -19,6 +19,6 @@ jobs:
       - name: Execute installation script
         run: bash installation.sh
 
-      - name: Create tag
-        run: bash mgr -g tag
+      - name: Make sure new version is tagged
+        run: bash mgr -g tag_check
       

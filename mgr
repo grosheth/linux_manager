@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # -- Version -- #
-VERSION='1.0.0'
+VERSION="0.0.0"
 
 # -- Colors -- #
 BLACK='\033[0;30m'
@@ -35,10 +35,10 @@ usage_git="
 
     -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
     token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
-    tag           [$(basename "$0") -g tag]                        Creates a Tag on the latest commit with current $(basename "$0") Version.
+    tag           [$(basename "$0") -g tag <patch,minor,major>]    Creates a Tag on the latest commit with current $(basename "$0") Version.
+    tag_check     [$(basename "$0") -g tag_check]                  Check if a tag exists on the repo. Used in for Github actions pipeline.
     repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
     init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
-
 "
 usage_git_repo="
     Options:      Syntax:                                          Description:
@@ -123,15 +123,86 @@ automatic_git () {
     fi
 }
 
+check_tag () {
+  echo -e "checking tags"
+  tag_list=$(git tag)
+  for tag in tag_list
+  do
+    if [ ${tag} == ${VERSION} ];then
+      echo -e "The tag ${VERSION} is created, "
+      exit 0
+    fi
+  done
+}
+
+git_bump_patch () {
+  patch="${VERSION#*.}"
+  patch="${patch#*.}"
+  
+  if [ $patch == 9 ]; then
+    git_bump_minor
+  else
+    patch=$((patch+1))
+    VERSION=${VERSION%?}$patch
+  fi
+}
+
+git_bump_minor () {
+  patch=0
+  minor="${VERSION#*.}"
+  minor="${minor:0:1}"
+  major="${VERSION%.*}"
+  major="${major%.*}"
+
+  if [ $minor == 9 ]; then
+    git_bump_major
+  else
+    minor=$((minor+1))
+    VERSION=$major.$minor.$patch
+  fi
+}
+
+git_bump_major () {
+  patch=0
+  minor=0
+  major="${VERSION%.*}"
+  major="${major%.*}"
+  major=$((major+1))
+  VERSION=$major.$minor.$patch
+}
+
+# Make this feature universal, currently only works with this repo
 git_tag () {
   {
       COMMAND=$(git add .)
   }
   CMD_RETURN_CODE=$?
-  
-  git tag $VERSION
-  git push origin $VERSION
 
+  if [ ${CMD_RETURN_CODE} == 0 ]; then
+
+    # $LIST variable is created before calling this function
+    for bump in $LIST; do
+      case "$bump" in
+        patch)
+          git_bump_patch
+          ;;
+        minor)
+          git_bump_minor
+          ;;
+        major)
+          git_bump_major
+          ;;
+      esac
+    done
+    
+    git tag $VERSION HEAD
+    git push origin $VERSION
+    echo $VERSION > ~/.$(basename "$0")/VERSION
+
+  else
+    echo -e "${RED}You must be in the mgr git folder to upgrade this projects version"
+    exit 1
+  fi
 }
 
 setup_python_venv () {
@@ -157,7 +228,6 @@ add_github_token () {
   read -p "Set your Github Token: " github_token
   echo $github_token > ~/.mgr/token
 }
-
 
 create_github_repo () {
   if [ ! -f ~/.$(basename "$0")/token ]; then
@@ -231,8 +301,7 @@ update_system () {
 add_to_list () {
   LIST=$@
 
-  for package in $LIST
-  do
+  for package in $LIST; do
     case "$package" in
       -d)
         file="dependencies"
@@ -259,8 +328,7 @@ install_dependencies () {
     if [[ $SYSTEM == *"arch"* ]]; then
       echo -e "${GREEN}According to os-release, your system is Arch based \n ${WHITE}"
       
-      for package in $PACKAGE_LIST
-      do
+      for package in $PACKAGE_LIST; do
         echo -e "${GREEN}Installing ${package} ${WHITE}"
         sudo pacman -S ${package} --noconfirm
       done
@@ -268,8 +336,7 @@ install_dependencies () {
 
     if [[ $SYSTEM == *"debian"* ]]; then
       echo -e "${GREEN}According to os-release, your system is Debian based \n${WHITE}"
-      for package in $PACKAGE_LIST
-      do
+      for package in $PACKAGE_LIST; do
         echo -e "${GREEN}Installing ${package} ${WHITE}"
         sudo apt-get install ${package}  -y
       done
@@ -277,8 +344,7 @@ install_dependencies () {
 
     if [[ $SYSTEM == *"fedora"* ]]; then
       echo -e "${GREEN}According to os-release, your system is Fedora \n ${WHITE}"
-      for package in $PACKAGE_LIST
-      do
+      for package in $PACKAGE_LIST; do
         echo -e "${GREEN}Installing ${package} ${WHITE}"
         sudo dnf install ${package} -y
       done
@@ -331,8 +397,7 @@ backup () {
   mkdir ${backup_location}/${current_date}
   backup_folder="${backup_location}/${current_date}"
 
-  for item in ${backup_list}
-  do
+  for item in ${backup_list}; do
     {
       COMMAND=$(stat ${item})
     }
@@ -361,10 +426,8 @@ control_service () {
     exit 1
   fi
 
-  for service in $LIST
-  do
-    for managed_service in $services_list
-    do
+  for service in $LIST; do
+    for managed_service in $services_list; do
       if [ ${service} == ${managed_service} ]; then
         SERVICE=$service
       fi
@@ -375,8 +438,7 @@ control_service () {
     SERVICE=$services_list
   fi
 
-  for action in $LIST
-  do
+  for action in $LIST; do
     case $action in
       start)
         sudo systemctl start $SERVICE
@@ -396,7 +458,6 @@ control_service () {
     esac
   done
 }
-
 
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
@@ -422,6 +483,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         g)
+          LIST=$@
           if [ -z $2 ]; then
             echo "$form_top $usage_git"
           else
@@ -455,6 +517,9 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                   fi
                     github_init $3 $4 private
                 fi
+                ;;
+              tag_check)
+                check_tag
                 ;;
               *)
                 automatic_git $2

@@ -11,12 +11,6 @@ jobs:
       - name: Get Project on Git
         uses: actions/checkout@v3.5.3
 
-      # - name: Get current tags on Repo
-      #   run: git tag
-
-      # - name: Check if current dev version is not already released
-      #   run: check current tags on GH
-
       - name: Adjust rights on installation script
         run: chmod 755 installation.sh
       
@@ -34,7 +28,7 @@ jobs:
 
         # Install Dependencies Test
       - name: Add Python3 to installation list
-        run: bash mgr -d add python3 python3-venv docker
+        run: bash mgr -d add python3 python3-venv
 
       - name: Install Python
         run: bash mgr -d install
@@ -61,36 +55,36 @@ jobs:
         run: bash mgr -g
 
         # Services test
-      - name: Unmask and recreate docker.service
-        run: sudo systemctl start docker
+        # Make custom service
+      # - name: Unmask and recreate docker.service
+      #   run: sudo systemctl start docker
         
-      - name: Test mgr services
-        run: bash mgr -s
+      # - name: Test mgr services
+      #   run: bash mgr -s
 
-      - name: Test adding a service
-        run: bash mgr -s add docker
+      # - name: Test adding a service
+      #   run: bash mgr -s add docker
 
-      - name: Test service start
-        run: bash mgr -s start docker
+      # - name: Test service start
+      #   run: bash mgr -s start docker
 
-      - name: check service status
-        run: bash mgr -s status docker
+      # - name: check service status
+      #   run: bash mgr -s status docker
 
-      - name: Test service stop
-        run: bash mgr -s stop docker
+      # - name: Test service stop
+      #   run: bash mgr -s stop docker
 
-      - name: check service status
-        run: bash mgr -s status docker
+      # - name: check service status
+      #   run: bash mgr -s status docker
 
-      - name: Test service enable
-        run: bash mgr -s enable docker
+      # - name: Test service enable
+      #   run: bash mgr -s enable docker
 
-      - name: check service status
-        run: bash mgr -s status docker
+      # - name: check service status
+      #   run: bash mgr -s status docker
 
-      - name: Test service disable
-        run: bash mgr -s disable docker
+      # - name: Test service disable
+      #   run: bash mgr -s disable docker
 
-      - name: check service status
-        run: bash mgr -s status docker
-
+      # - name: check service status
+      #   run: bash mgr -s status docker
