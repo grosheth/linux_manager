@@ -61,13 +61,16 @@ jobs:
         run: bash mgr -g
 
         # Services test
+      - name: Unmask Docker service to test
+        run: sudo systemctl unmask docker
+        
       - name: Test mgr services
         run: bash mgr -s
 
-      - name: Tester l'ajout de services a controller
+      - name: Test adding a service
         run: bash mgr -s add docker
 
-      - name: Test service startup
+      - name: Test service start
         run: bash mgr -s start docker
 
       - name: check service status
