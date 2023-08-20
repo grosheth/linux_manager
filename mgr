@@ -44,7 +44,7 @@ usage="
 usage_git="
     Options:      Syntax:                                          Description:
 
-    -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
+    -g            [$(basename "$0") -g 'commit message']           Git add,commit, and push to Git in the current directory.
     token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
     tag           [$(basename "$0") -g tag <patch,minor,major>]    Creates a Tag on the latest commit with current $(basename "$0") Version.
     tag_check     [$(basename "$0") -g tag_check]                  Check if a tag exists on the repo. Used in for Github actions pipeline.
