@@ -491,13 +491,13 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
     while getopts ':-gpuvdsbh' option; do
       case "$option" in
         h)
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage"
           fi
           ;;
         g)
           LIST=$@
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage_git"
           else
             case $2 in
@@ -508,10 +508,10 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 git_tag
                 ;;
               repo)
-                if [ -z $3 ]; then
+                if [[ -z $3 ]]; then
                   echo "$form_top $usage_git_repo"
                 else
-                  if [ -z $4 ]; then
+                  if [[ -z $4 ]]; then
                     private="true"
                   else
                     private=$4
@@ -520,10 +520,10 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 fi
                 ;;
               init)
-                if [ -z $3 ]; then
+                if [[ -z $3 ]]; then
                   echo "$form_top $usage_git_init"
                 else
-                  if [ -z $5 ]; then
+                  if [[ -z $5 ]]; then
                     private="true"
                   else
                     private=$5
@@ -541,7 +541,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         p)
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage_python_venv"
           else
             case $2 in
@@ -558,7 +558,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           update_system
           ;;
         d)
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage_install_dependencies"
           else
             case $2 in
@@ -584,7 +584,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           get_version
           ;;
         s)
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage_services"
           else
             case $2 in
@@ -619,7 +619,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         b)
-          if [ -z $2 ]; then
+          if [[ -z $2 ]]; then
             echo "$form_top $usage_backup"
           else
             case $2 in
