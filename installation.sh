@@ -75,7 +75,6 @@ do
     # Copies mgr binary for local user
     if [[ $number == 8 ]]; then
         steps="Copying_files"
-        cp mgr $HOME/.local/mgr
         cp mgr /usr/bin/mgr
     fi
 
