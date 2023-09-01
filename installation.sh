@@ -81,7 +81,8 @@ do
 	ProgressBar ${number} ${_end} ${steps}
 done
 
-mgr -v > $HOME/.mgr/VERSION
+TAG=$(git describe --tags | sed 's/[^0-9.]//g')
+echo ${TAG} > $HOME/.mgr/VERSION
 
 {
     COMMAND=$(which mgr)
