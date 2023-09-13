@@ -477,6 +477,14 @@ control_service () {
   done
 }
 
+update_self() {
+  # Function to get specific tag, dev or latest version
+  # Could get into mgr -u function
+  # Make a backup of all files in .mgr Then reinstall
+  pass
+}
+
+
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
 currentdate=$(echo $(date '+%Y-%m-%d'))
