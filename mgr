@@ -51,6 +51,7 @@ usage_git="
     repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
     init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
 "
+
 usage_git_repo="
     Options:      Syntax:                                          Description:
 
@@ -114,6 +115,22 @@ usage_services="
     status        [$(basename "$0") -s status <service>]           Show current service status.
     clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
 "
+
+usage_update="
+    Options:      Syntax:                                          Description:
+
+    -u            [$(basename "$0") -u]                            Update your system with default package manager. Debian=apt, Arch=pacman ...
+    mgr           [$(basename "$0") -u mgr]                     Update this program with specific version, latest version or development version.
+      ├───────[$(basename "$0") -u mgr:1.0.0]
+      ├───────[$(basename "$0") -u mgr:dev]
+"
+
+usage_version="
+    Options:      Syntax:                                          Description:
+
+    -v            [$(basename "$0") -v]                            Get the current version of $(basename "$0")
+"
+
 # -- Functions -- #
 
 automatic_git () {
@@ -568,7 +585,18 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         u)
-          update_system
+          if [[ -z $2 ]]; then
+            update_system
+          else
+            case $2 in
+              mgr)
+                update_self
+                ;;
+              *)
+                echo "$form_top $usage_update"
+                ;;
+            esac
+          fi
           ;;
         d)
           if [[ -z $2 ]]; then
@@ -594,7 +622,15 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         v)
-          get_version
+          if [[ -z $2 ]]; then
+            get_version
+          else
+            case $2 in
+              *)
+                echo "$form_top $usage_version"
+                ;;
+            esac
+          fi
           ;;
         s)
           if [[ -z $2 ]]; then
