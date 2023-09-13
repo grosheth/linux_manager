@@ -22,6 +22,8 @@ _start=1
 # This is the amount of tasks that needs to be done in the installation
 _end=8
 
+# String to append to .bashrc or zshrc
+app_str='export PATH="$HOME/.mgr/bin:$PATH"'
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -42,6 +44,7 @@ do
     if [[ $number == 3 ]]; then
         steps="Create_folder"
         mkdir $HOME/.mgr
+        mkdir $HOME/.mgr/bin
     fi
 
     # Create the backup folder
@@ -75,7 +78,16 @@ do
     # Copies mgr binary for local user
     if [[ $number == 8 ]]; then
         steps="Copying_files"
-        cp mgr /usr/bin/mgr
+
+        # Check Shell
+        if [[ $SHELL == *"bash"* ]]; then
+            shell='bash'
+        fi
+
+        if [[ $SHELL == *"zsh"* ]]; then
+            shell='zsh'
+        fi
+        echo "${app_str}" >> ~/.${shell}rc
     fi
 
 	ProgressBar ${number} ${_end} ${steps}
@@ -94,5 +106,4 @@ if [ $CMD_RETURN_CODE == 0 ]; then
     which mgr
 else
     echo "Done"
-
 fi
