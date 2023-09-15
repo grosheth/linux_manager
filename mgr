@@ -45,41 +45,30 @@ usage="
 "
 
 usage_git="
-    Options:      Syntax:                                          Description:
+    Options:        Syntax:                                           Description:
 
-    -g            [$(basename "$0") -g 'commit message']           Git add,commit, and push to Git in the current directory.
-    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
-    tag           [$(basename "$0") -g tag <patch,minor,major>]    Creates a Tag on the latest commit with current $(basename "$0") Version.
-    tag_check     [$(basename "$0") -g tag_check]                  Check if a tag exists on the repo. Used in for Github actions pipeline.
-    repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
-    init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
-"
-
-usage_git_repo="
-    Options:      Syntax:                                          Description:
-
-    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github.
-    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create.
-    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private.
-
-"
-
-usage_git_init="
-    Options:      Syntax:                                            Description:
-
-    init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
-    user          [$(basename "$0") -g init user name private]       Your Github username.
-    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create.
-    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private.
-
+    -g              [$(basename "$0") -g 'commit message']            Git add,commit, and push to Git in the current directory.
+    .
+    ├─token         [$(basename "$0") -g token]                       Creates a environment var with your Token to call the Github API.
+    ├─tag           [$(basename "$0") -g tag <patch,minor,major>]     Creates a Tag on the latest commit with current $(basename "$0") Version.
+    ├─tag_check     [$(basename "$0") -g tag_check]                   Check if a tag exists on the repo. Used in for Github actions pipeline.
+    ├─repo          [$(basename "$0") -g repo]                        Creates a repo on Github.
+    ├  ├─ name      [$(basename "$0") -g repo newproject private] Name of the repo you want to create.
+    ├  └─ private   [$(basename "$0") -g repo newproject true]    Bool 'true' or 'false' to set the repo public or private.
+    ├
+    └─init          [$(basename "$0") -g init]                        Send the current repo on Github. This will create the repo on Github.
+      ├─ user       [$(basename "$0") -g init user name private]      Your Github username.
+      ├─ name       [$(basename "$0") -g init user project private]   Name of the repo you want to create.
+      └─ private    [$(basename "$0") -g init user project true]      Bool 'true' or 'false' to set the repo public or private.
 "
 
 usage_python_venv="
     Options:      Syntax:                                          Description:
 
     -p            [$(basename "$0") -p]                            shows this help message.
-    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
-    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
+    .
+    ├─ venv       [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
+    └─ <name>     [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
 
 "
 
@@ -87,37 +76,39 @@ usage_install_dependencies="
     Options:      Syntax:                                          Description:
 
     -d            [$(basename "$0") -d]                            shows this help message.
-    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
-    add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
-    install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
-    clear         [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
+    .
+    ├─ list       [$(basename "$0") -d list]                       lists the current dependencies to install.
+    ├─ add        [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
+    ├─ install    [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
+    └─ clear      [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
 "
 
 usage_backup="
     Options:      Syntax:                                          Description:
 
     -b            [$(basename "$0") -b]                            Shows this help message.
-    add           [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
-    list          [$(basename "$0") -b list]                       lists the current backups and its location.
-    location      [$(basename "$0") -b location]                   Change location for backup.
-    clear         [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
-    run           [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
-    bookmarks     [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
-"
+    .
+    ├─ add        [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
+    ├─ list       [$(basename "$0") -b list]                       lists the current backups and its location.
+    ├─ location   [$(basename "$0") -b location]                   Change location for backup.
+    ├─ clear      [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
+    ├─ run        [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
+    └─ bookmarks  [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
+" 
 
 usage_services="
     Options:      Syntax:                                          Description:
 
     -s            [$(basename "$0") -s]                            Shows this help message.
     .
-    ├─ list          [$(basename "$0") -s list]                    lists the current services managed by $(basename "$0")
-    ├─ clear         [$(basename "$0") -s clear]                   Clear the ~/.$(basename "$0")/service file  
-    ├─ add           [$(basename "$0") -s add <service>]           Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
-    ├─ start         [$(basename "$0") -s start <service>]         Start the selected service.
-    ├─ stop          [$(basename "$0") -s stop <service>]          Stop the selected service
-    ├─ enable        [$(basename "$0") -s enable <service>]        Enable the selected service.
-    ├─ disable       [$(basename "$0") -s disable <service>]       Disable the selected service.
-    └─ status        [$(basename "$0") -s status <service>]        Show current service status.
+    ├─ list       [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
+    ├─ clear      [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file  
+    ├─ add        [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
+    ├─ start      [$(basename "$0") -s start <service>]            Start the selected service.
+    ├─ stop       [$(basename "$0") -s stop <service>]             Stop the selected service
+    ├─ enable     [$(basename "$0") -s enable <service>]           Enable the selected service.
+    ├─ disable    [$(basename "$0") -s disable <service>]          Disable the selected service.
+    └─ status     [$(basename "$0") -s status <service>]           Show current service status.
 "
 
 usage_update="
@@ -547,7 +538,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 ;;
               repo)
                 if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git_repo"
+                  echo "$form_top $usage_git"
                 else
                   if [[ -z $4 ]]; then
                     private="true"
@@ -559,7 +550,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 ;;
               init)
                 if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git_init"
+                  echo "$form_top $usage_git"
                 else
                   if [[ -z $5 ]]; then
                     private="true"
