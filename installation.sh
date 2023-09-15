@@ -23,7 +23,7 @@ _start=1
 _end=8
 
 # String to append to .bashrc or zshrc
-app_str='export PATH="$HOME/.mgr/bin:$PATH"'
+app_str='alias mgr="$HOME/.mgr/bin/mgr"'
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -78,6 +78,8 @@ do
     # Copies mgr binary for local user
     if [[ $number == 8 ]]; then
         steps="Copying_files"
+        
+        cp mgr $HOME/.mgr/bin
 
         # Check Shell
         if [[ $SHELL == *"bash"* ]]; then
@@ -106,4 +108,5 @@ if [ $CMD_RETURN_CODE == 0 ]; then
     which mgr
 else
     echo "Done"
+    source ~/.${shell}rc
 fi
