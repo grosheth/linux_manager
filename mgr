@@ -120,9 +120,9 @@ usage_update="
     Options:      Syntax:                                          Description:
 
     -u            [$(basename "$0") -u]                            Update your system with default package manager. Debian=apt, Arch=pacman ...
-    mgr           [$(basename "$0") -u mgr]                     Update this program with specific version, latest version or development version.
-      ├───────[$(basename "$0") -u mgr:1.0.0]
-      ├───────[$(basename "$0") -u mgr:dev]
+    mgr           [$(basename "$0") -u mgr]                        Update this program with specific version, latest version or development version.
+    ├─────────────[$(basename "$0") -u mgr:1.0.0]
+    ├─────────────[$(basename "$0") -u mgr:dev]
 "
 
 usage_version="
@@ -496,8 +496,7 @@ control_service () {
 
 update_self() {
   # Function to get specific tag, dev or latest version
-  # Could get into mgr -u function
-  # Make a backup of all files in .mgr Then reinstall
+  
   pass
 }
 
@@ -518,6 +517,8 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
     # -- Execution -- #
     no_args="true"
     if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
+    
+    # This is all accepted parameters with a "-"
     while getopts ':-gpuvdsbh' option; do
       case "$option" in
         h)
