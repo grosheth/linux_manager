@@ -109,23 +109,27 @@ usage_services="
     Options:      Syntax:                                          Description:
 
     -s            [$(basename "$0") -s]                            Shows this help message.
-    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
-    list          [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
-    start         [$(basename "$0") -s start <service>]            Start the selected service.
-    stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
-    enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
-    disable       [$(basename "$0") -s disable <service>]          Disable the selected service.
-    status        [$(basename "$0") -s status <service>]           Show current service status.
-    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
+    .
+    ├─ list          [$(basename "$0") -s list]                    lists the current services managed by $(basename "$0")
+    ├─ clear         [$(basename "$0") -s clear]                   Clear the ~/.$(basename "$0")/service file  
+    ├─ add           [$(basename "$0") -s add <service>]           Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
+    ├─ start         [$(basename "$0") -s start <service>]         Start the selected service.
+    ├─ stop          [$(basename "$0") -s stop <service>]          Stop the selected service
+    ├─ enable        [$(basename "$0") -s enable <service>]        Enable the selected service.
+    ├─ disable       [$(basename "$0") -s disable <service>]       Disable the selected service.
+    └─ status        [$(basename "$0") -s status <service>]        Show current service status.
 "
 
 usage_update="
     Options:      Syntax:                                          Description:
 
-    -u            [$(basename "$0") -u]                            Update your system with default package manager. Debian=apt, Arch=pacman ...
-    mgr           [$(basename "$0") -u mgr]                        Update this program with specific version, latest version or development version.
-    ├─────────────[$(basename "$0") -u mgr:1.0.0]
-    └─────────────[$(basename "$0") -u mgr:dev]
+    -u                 [$(basename "$0") -u]                       Update your system with default package manager. Debian=apt, Arch=pacman ...
+    .
+    └─── mgr           [$(basename "$0") -u mgr]                   Update this program with specific version, latest version or development version.
+         .
+         ├─────────────[$(basename "$0") -u mgr:1.0.0]
+         └─────────────[$(basename "$0") -u mgr:dev]        
+    
 "
 
 usage_version="
