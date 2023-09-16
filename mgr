@@ -53,10 +53,12 @@ usage_git="
     ├─tag           [$(basename "$0") -g tag <patch,minor,major>]     Creates a Tag on the latest commit with current $(basename "$0") Version.
     ├─tag_check     [$(basename "$0") -g tag_check]                   Check if a tag exists on the repo. Used in for Github actions pipeline.
     ├─repo          [$(basename "$0") -g repo]                        Creates a repo on Github.
-    ├  ├─ name      [$(basename "$0") -g repo newproject private] Name of the repo you want to create.
-    ├  └─ private   [$(basename "$0") -g repo newproject true]    Bool 'true' or 'false' to set the repo public or private.
+    ├  . 
+    ├  ├─ name      [$(basename "$0") -g repo newproject private]     Name of the repo you want to create.
+    ├  └─ private   [$(basename "$0") -g repo newproject true]        Bool 'true' or 'false' to set the repo public or private.
     ├
     └─init          [$(basename "$0") -g init]                        Send the current repo on Github. This will create the repo on Github.
+      .
       ├─ user       [$(basename "$0") -g init user name private]      Your Github username.
       ├─ name       [$(basename "$0") -g init user project private]   Name of the repo you want to create.
       └─ private    [$(basename "$0") -g init user project true]      Bool 'true' or 'false' to set the repo public or private.
@@ -118,8 +120,10 @@ usage_update="
     .
     └─── mgr           [$(basename "$0") -u mgr]                   Update this program with specific version, latest version or development version.
          .
-         ├─────────────[$(basename "$0") -u mgr:1.0.0]
-         └─────────────[$(basename "$0") -u mgr:dev]        
+         ├─────────────[$(basename "$0") -u mgr:1.0.0]             Update to specific version of program
+         ├─────────────[$(basename "$0") -u mgr:dev]               Update to dev version of program
+         ├─────────────[$(basename "$0") -u mgr ssh]               Update the project to latest using ssh [default]
+         └─────────────[$(basename "$0") -u mgr https]             Update the project to latest using Https
     
 "
 
@@ -468,34 +472,47 @@ control_service () {
   done
 
   if [[ -z ${SERVICE} ]]; then
-    SERVICE=$services_list
+    SERVICE=${services_list}
   fi
 
-  for action in $LIST; do
-    case $action in
+  for action in ${LIST}; do
+    case ${action} in
       start)
-        sudo systemctl start $SERVICE
+        sudo systemctl start ${SERVICE}
         ;;
       stop)
-        sudo systemctl stop $SERVICE
+        sudo systemctl stop ${SERVICE}
         ;;
       enable)
-        sudo systemctl enable $SERVICE
+        sudo systemctl enable ${SERVICE}
         ;;
       disable)
-        sudo systemctl disable $SERVICE
+        sudo systemctl disable ${SERVICE}
         ;;
       status)
-        sudo systemctl status $SERVICE
+        sudo systemctl status ${SERVICE}
         ;;
     esac
   done
 }
 
 update_self() {
-  # Function to get specific tag, dev or latest version
-  
-  pass
+  current_path=$(pwd)
+  arguements=$@
+  cd /tmp
+
+  # Get version to update
+
+
+  # Get protocol to update
+
+
+  # Update project
+  git clone git@github.com:grosheth/linux_manager.git
+  git checkout ${version}
+  cd linux_manager
+
+  cd ${current_path}
 }
 
 
@@ -514,7 +531,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
 
     # -- Execution -- #
     no_args="true"
-    if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
+    if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
     
     # This is all accepted parameters with a "-"
     while getopts ':-gpuvdsbh' option; do
