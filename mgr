@@ -502,7 +502,7 @@ update_self() {
   cd /tmp
 
   # Get version to update
-
+  echo ${arguements}
 
   # Get protocol to update
 
