@@ -37,7 +37,7 @@ usage="
 
     -g            [$(basename "$0") -g 'commit message']           Combines basic Git commands. Can also use GitHub API.
     -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment.
-    -u            [$(basename "$0") -u]                            Updates current System. (sudo)
+    -u            [$(basename "$0") -u]                            Updates current System or mgr itself. (sudo)
     -v            [$(basename "$0") -v]                            Current version of mgr.
     -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
     -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
@@ -116,14 +116,14 @@ usage_services="
 usage_update="
     Options:      Syntax:                                          Description:
 
-    -u                 [$(basename "$0") -u]                       Update your system with default package manager. Debian=apt, Arch=pacman ...
+    -u            [$(basename "$0") -u]                            Update your system with default package manager. Debian=apt, Arch=pacman ...
     .
-    └─── mgr           [$(basename "$0") -u mgr]                   Update this program with specific version, latest version or development version.
+    └─── mgr      [$(basename "$0") -u mgr]                        Update this program with specific version, latest version or development version.
          .
-         ├─────────────[$(basename "$0") -u mgr:1.0.0]             Update to specific version of program
-         ├─────────────[$(basename "$0") -u mgr:dev]               Update to dev version of program
-         ├─────────────[$(basename "$0") -u mgr ssh]               Update the project to latest using ssh [default]
-         └─────────────[$(basename "$0") -u mgr https]             Update the project to latest using Https
+         ├────────[$(basename "$0") -u mgr:1.0.0]                  Update to specific version of program
+         ├────────[$(basename "$0") -u mgr:dev]                    Update to dev version of program
+         ├────────[$(basename "$0") -u mgr ssh]                    Update the project to latest using ssh [default]
+         └────────[$(basename "$0") -u mgr https]                  Update the project to latest using Https
     
 "
 
@@ -502,15 +502,20 @@ update_self() {
   cd /tmp
 
   # Get version to update
-  echo ${arguements}
+  echo $2
+
+  if [[ $2 == *":"* ]]; then
+    output=$(echo $2| awk -F ":")
+    echo ${output}
+  fi
 
   # Get protocol to update
 
 
   # Update project
-  git clone git@github.com:grosheth/linux_manager.git
-  git checkout ${version}
-  cd linux_manager
+  # git clone git@github.com:grosheth/linux_manager.git
+  # git checkout ${version}
+  # cd linux_manager
 
   cd ${current_path}
 }
@@ -518,7 +523,7 @@ update_self() {
 
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
-currentdate=$(echo $(date '+%Y-%m-%d'))
+CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
 
 
 (( ! IMPL_MODE && ! NEST_LVL )) && {
@@ -605,8 +610,8 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
             update_system
           else
             case $2 in
-              mgr)
-                update_self
+              mgr*)
+                update_self $@
                 ;;
               *)
                 echo "$form_top $usage_update"
@@ -718,7 +723,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
     done
 
     exec $0 "$@"
-  ) | tee -a "${HOME}/.mgr/logs/log${currentdate}.out" 2>&1
+  ) | tee -a "${HOME}/.mgr/logs/log${CURRENTDATE}.out" 2>&1
   ) 1>&3 2>&4
 
   exit $?
