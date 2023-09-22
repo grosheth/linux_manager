@@ -512,6 +512,7 @@ update_self() {
   # Get protocol to update
 
 
+
   # Update project
   # git clone git@github.com:grosheth/linux_manager.git
   # git checkout ${version}
