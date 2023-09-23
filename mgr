@@ -512,17 +512,19 @@ update_self() {
   # Get protocol to update
 
   if [[ $3 == "https" ]]; then
-    type="https://github.com/grosheth/linux_manager.git"
+    project_url="https://github.com/grosheth/linux_manager.git"
   else
-    type="git@github.com:grosheth/linux_manager.git"
+    project_url="git@github.com:grosheth/linux_manager.git"
   fi
 
   # Update project
-  # git clone git@github.com:grosheth/linux_manager.git
-  # git checkout ${version}
-  # cd linux_manager
-
-  cd ${current_path}
+  git clone ${project_url}
+  pwd
+  cd linux_manager
+  pwd
+  git checkout ${version}
+  git branch
+  # cd ${current_path}
 }
 
 
