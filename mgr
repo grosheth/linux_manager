@@ -499,6 +499,7 @@ control_service () {
 update_self() {
   current_path=$(pwd)
   arguements=$@
+  rm -rf /tmp/linux_manager
   cd /tmp
 
   # Get version to update
