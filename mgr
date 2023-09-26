@@ -505,8 +505,12 @@ update_self() {
   echo $2
 
   if [[ $2 == *":"* ]]; then
-    output=$(echo $2| awk -F ":")
-    echo ${output}
+    version=$(echo $2| awk -F ":")
+    echo ${version}
+  fi
+
+  if [[ ${version} == "mgr" ]]; then
+    version="main"
   fi
 
   # Get protocol to update
