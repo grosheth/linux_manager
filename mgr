@@ -530,6 +530,7 @@ update_self() {
   git checkout ${version}
   git branch
   # cd ${current_path}
+  
 }
 
 
