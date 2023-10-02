@@ -524,9 +524,8 @@ update_self() {
 
   # Update project
   git clone ${project_url}
-  pwd
   cd linux_manager
-  pwd
+  git fetch --all
   git checkout ${version}
   git branch
   # cd ${current_path}
