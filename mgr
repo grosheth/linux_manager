@@ -305,7 +305,7 @@ check_system () {
 update_system () {
   check_system
 
-  if [ -z $SYSTEM ]; then
+  if [[ -z $SYSTEM ]]; then
     echo "make sure /etc/os-release file or symbolic link exists"
   else
 
