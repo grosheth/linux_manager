@@ -524,9 +524,9 @@ update_self() {
 
   # Update project
   git clone ${project_url} /tmp/linux_manager
-  git -git-dir=${binary_path}.git --work-tree=${binary_path} fetch --all
-  git --git-dir=${binary_path}.git --work-tree=${binary_path} checkout ${version}
-  git branch --git-dir=${binary_path}.git --work-tree=${binary_path}
+  git -C ${binary_path} fetch --all
+  git -C ${binary_path} checkout ${version}
+  git -C ${binary_path} branch
   # bash installation.sh
   # cd ${current_path}
   
