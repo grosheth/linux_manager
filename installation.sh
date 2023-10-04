@@ -23,7 +23,6 @@ _start=1
 _end=8
 
 # String to append to .bashrc or zshrc
-app_str='alias mgr="$HOME/.mgr/bin/mgr"'
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -80,16 +79,6 @@ do
         steps="Copying_files"
         
         cp mgr $HOME/.mgr/bin
-
-        # Check Shell
-        if [[ $SHELL == *"bash"* ]]; then
-            shell='bash'
-        fi
-
-        if [[ $SHELL == *"zsh"* ]]; then
-            shell='zsh'
-        fi
-        echo "${app_str}" >> ~/.${shell}rc
     fi
 
 	ProgressBar ${number} ${_end} ${steps}
@@ -107,6 +96,21 @@ if [ $CMD_RETURN_CODE == 0 ]; then
     echo "program is installed here: "
     which mgr
 else
-    echo "Done"
+    app_str='alias mgr="$HOME/.mgr/bin/mgr"'
+    
+    # Check Shell
+    if [[ $SHELL == *"bash"* ]]; then
+        shell='bash'
+    fi
+
+    if [[ $SHELL == *"zsh"* ]]; then
+        shell='zsh'
+    fi
+
+    echo "${app_str}" >> ~/.${shell}rc
+    
     source ~/.${shell}rc
+    
+    echo "Done"
+
 fi

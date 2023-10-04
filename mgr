@@ -497,7 +497,6 @@ control_service () {
 }
 
 update_self() {
-  current_path=$(pwd)
   binary_path="/tmp/linux_manager"
   arguements=$@
   rm -rf /tmp/linux_manager
@@ -525,10 +524,8 @@ update_self() {
   # Update project
   git clone ${project_url} /tmp/linux_manager
   git -C ${binary_path} fetch --all
-  git -C ${binary_path} checkout ${version}
-  git -C ${binary_path} branch
+  git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
   # bash installation.sh
-  # cd ${current_path}
   
 }
 
