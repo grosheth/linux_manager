@@ -78,7 +78,7 @@ do
     if [[ $number == 8 ]]; then
         steps="Copying_files"
         
-        cp mgr $HOME/.mgr/bin
+        cp -f mgr $HOME/.mgr/bin
     fi
 
 	ProgressBar ${number} ${_end} ${steps}
