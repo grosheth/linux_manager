@@ -112,5 +112,6 @@ else
     source ~/.${shell}rc
     
     echo "Done"
-
 fi
+
+exit 0
