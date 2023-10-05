@@ -500,18 +500,16 @@ update_self() {
   binary_path="/tmp/linux_manager"
   arguements=$@
   rm -rf /tmp/linux_manager
-
   # Get version to update
-  echo $2
 
   if [[ $2 == *":"* ]]; then
-    version=$(echo $2| awk -F ":")
-    echo ${version}
-  fi
-
-  if [[ ${version} == "mgr" ]]; then
+    version=$(cut -d: -f2 <<< ${2})
+  else
     version="main"
   fi
+
+  echo -e "${GREEN}Downloading mgr: ${version} ${WHITE}"
+  # Get protocol to update
 
   # Get protocol to update
 
