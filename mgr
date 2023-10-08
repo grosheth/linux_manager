@@ -524,6 +524,7 @@ update_self() {
   git -C ${binary_path} fetch --all
   git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
   source ${binary_path}/installation.sh
+  
   mgr -v
 }
 
