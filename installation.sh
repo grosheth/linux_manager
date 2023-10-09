@@ -85,6 +85,7 @@ do
 done
 
 TAG=$(git describe --tags | cut -d- -f1)
+echo -e "${GREEN} Sending version: ${TAG} to $HOME/.mgr/VERSION"  
 echo ${TAG} > $HOME/.mgr/VERSION
 
 {

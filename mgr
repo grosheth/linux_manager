@@ -520,9 +520,9 @@ update_self() {
   git clone ${project_url} /tmp/linux_manager
   git -C ${binary_path} fetch --all
   git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
+  git describe --tags | cut -d- -f1
   source ${binary_path}/installation.sh
 }
-
 
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
