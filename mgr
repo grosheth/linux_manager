@@ -509,9 +509,6 @@ update_self() {
   fi
 
   echo -e "${GREEN}Downloading mgr: ${version} ${WHITE}"
-  # Get protocol to update
-
-  # Get protocol to update
 
   if [[ $3 == "https" ]]; then
     project_url="https://github.com/grosheth/linux_manager.git"
@@ -524,8 +521,6 @@ update_self() {
   git -C ${binary_path} fetch --all
   git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
   source ${binary_path}/installation.sh
-  
-  mgr -v
 }
 
 

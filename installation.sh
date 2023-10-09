@@ -84,7 +84,7 @@ do
 	ProgressBar ${number} ${_end} ${steps}
 done
 
-TAG=$(git describe --tags | sed 's/[^0-9.]//g')
+TAG=$(git describe --tags | cut -d- -f1)
 echo ${TAG} > $HOME/.mgr/VERSION
 
 {
