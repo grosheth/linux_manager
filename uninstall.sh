@@ -29,6 +29,7 @@ do
     if [[ $number == 1 ]]; then
         steps="removing_binary"
         rm $HOME/.local/bin/mgr
+        rm /usr/bin/mgr
     fi
 
     # removing home folder

@@ -22,6 +22,7 @@ _start=1
 # This is the amount of tasks that needs to be done in the installation
 _end=8
 
+# String to append to .bashrc or zshrc
 
 # Proof of concept
 for number in $(seq ${_start} ${_end})
@@ -42,6 +43,7 @@ do
     if [[ $number == 3 ]]; then
         steps="Create_folder"
         mkdir $HOME/.mgr
+        mkdir $HOME/.mgr/bin
     fi
 
     # Create the backup folder
@@ -75,13 +77,16 @@ do
     # Copies mgr binary for local user
     if [[ $number == 8 ]]; then
         steps="Copying_files"
-        cp mgr /usr/bin/mgr
+        
+        cp -f mgr $HOME/.mgr/bin
     fi
 
 	ProgressBar ${number} ${_end} ${steps}
 done
 
-mgr -v > $HOME/.mgr/VERSION
+TAG=$(git describe --tags | cut -d- -f1)
+echo -e "${GREEN} Sending version: ${TAG} to $HOME/.mgr/VERSION"  
+echo ${TAG} > $HOME/.mgr/VERSION
 
 {
     COMMAND=$(which mgr)
@@ -92,6 +97,22 @@ if [ $CMD_RETURN_CODE == 0 ]; then
     echo "program is installed here: "
     which mgr
 else
-    echo "Done"
+    app_str='alias mgr="$HOME/.mgr/bin/mgr"'
+    
+    # Check Shell
+    if [[ $SHELL == *"bash"* ]]; then
+        shell='bash'
+    fi
 
+    if [[ $SHELL == *"zsh"* ]]; then
+        shell='zsh'
+    fi
+
+    echo "${app_str}" >> ~/.${shell}rc
+    
+    source ~/.${shell}rc
+    
+    echo "Done"
 fi
+
+exit 0

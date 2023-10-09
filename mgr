@@ -23,6 +23,9 @@ BLUE='\033[0;34m'
 YELLOW='\033[0;36m'
 WHITE='\033[0;37m'
 
+# -- Tree Chars -- #
+# ├─ └─ ─
+
 # -- Help -- #
 form_top="
   linux_manager -- $(basename "$0") $VERSION -- Automate common tasks on Linux
@@ -34,7 +37,7 @@ usage="
 
     -g            [$(basename "$0") -g 'commit message']           Combines basic Git commands. Can also use GitHub API.
     -p            [$(basename "$0") -p]                            Creates a project folder with Python virtual Environment.
-    -u            [$(basename "$0") -u]                            Updates current System. (sudo)
+    -u            [$(basename "$0") -u]                            Updates current System or mgr itself. (sudo)
     -v            [$(basename "$0") -v]                            Current version of mgr.
     -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
     -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
@@ -42,40 +45,32 @@ usage="
 "
 
 usage_git="
-    Options:      Syntax:                                          Description:
+    Options:        Syntax:                                           Description:
 
-    -g            [$(basename "$0")  -g 'commit message']          Git add,commit, and push to Git in the current directory.
-    token         [$(basename "$0") -g token]                      Creates a environment var with your Token to call the Github API.
-    tag           [$(basename "$0") -g tag <patch,minor,major>]    Creates a Tag on the latest commit with current $(basename "$0") Version.
-    tag_check     [$(basename "$0") -g tag_check]                  Check if a tag exists on the repo. Used in for Github actions pipeline.
-    repo          [$(basename "$0") -g repo]                       Creates a repo on Github.
-    init          [$(basename "$0") -g init]                       Send the current repo on Github. This will create the repo on Github if it doesn't exist.
-"
-usage_git_repo="
-    Options:      Syntax:                                          Description:
-
-    repo          [$(basename "$0") -g repo name private]          Creates a repo on Github.
-    name          [$(basename "$0") -g repo newproject private]    Name of the repo you want to create.
-    private       [$(basename "$0") -g repo newproject true]       Bool 'true' or 'false' to set the repo public or private.
-
-"
-
-usage_git_init="
-    Options:      Syntax:                                            Description:
-
-    init          [$(basename "$0") -g init name private]            Send the current repo on Github. This will create the repo if it doesn't exist.
-    user          [$(basename "$0") -g init user name private]       Your Github username.
-    name          [$(basename "$0") -g init user project private]    Name of the repo you want to create.
-    private       [$(basename "$0") -g init user project true]       Bool 'true' or 'false' to set the repo public or private.
-
+    -g              [$(basename "$0") -g 'commit message']            Git add,commit, and push to Git in the current directory.
+    .
+    ├─token         [$(basename "$0") -g token]                       Creates a environment var with your Token to call the Github API.
+    ├─tag           [$(basename "$0") -g tag <patch,minor,major>]     Creates a Tag on the latest commit with current $(basename "$0") Version.
+    ├─tag_check     [$(basename "$0") -g tag_check]                   Check if a tag exists on the repo. Used in for Github actions pipeline.
+    ├─repo          [$(basename "$0") -g repo]                        Creates a repo on Github.
+    ├  . 
+    ├  ├─ name      [$(basename "$0") -g repo newproject private]     Name of the repo you want to create.
+    ├  └─ private   [$(basename "$0") -g repo newproject true]        Bool 'true' or 'false' to set the repo public or private.
+    ├
+    └─init          [$(basename "$0") -g init]                        Send the current repo on Github. This will create the repo on Github.
+      .
+      ├─ user       [$(basename "$0") -g init user name private]      Your Github username.
+      ├─ name       [$(basename "$0") -g init user project private]   Name of the repo you want to create.
+      └─ private    [$(basename "$0") -g init user project true]      Bool 'true' or 'false' to set the repo public or private.
 "
 
 usage_python_venv="
     Options:      Syntax:                                          Description:
 
     -p            [$(basename "$0") -p]                            shows this help message.
-    venv          [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
-    <name>        [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
+    .
+    ├─ venv       [$(basename "$0") -p venv]                       Creates a Python virtual Environment and requirements.txt.
+    └─ <name>     [$(basename "$0") -p projectname]                Creates a project folder with Python virtual Environment
 
 "
 
@@ -83,37 +78,61 @@ usage_install_dependencies="
     Options:      Syntax:                                          Description:
 
     -d            [$(basename "$0") -d]                            shows this help message.
-    list          [$(basename "$0") -d list]                       lists the current dependencies to install.
-    add           [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
-    install       [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
-    clear         [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
+    .
+    ├─ list       [$(basename "$0") -d list]                       lists the current dependencies to install.
+    ├─ add        [$(basename "$0") -d add <package name>]         Add dependencies to ~/$(basename "$0")/dependencies.
+    ├─ install    [$(basename "$0") -d install]                    Install the dependencies located in ~/$(basename "$0")/dependencies.
+    └─ clear      [$(basename "$0") -d clear]                      Clear the ~/.$(basename "$0")/dependencies file
 "
 
 usage_backup="
     Options:      Syntax:                                          Description:
 
     -b            [$(basename "$0") -b]                            Shows this help message.
-    add           [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
-    list          [$(basename "$0") -b list]                       lists the current backups and its location.
-    location      [$(basename "$0") -b location]                   Change location for backup.
-    clear         [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
-    run           [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
-    bookmarks     [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
-"
+    .
+    ├─ add        [$(basename "$0") -b add <file/folder>]          Add file or folder to backup into the ~/.$(basename "$0")/backup_list .
+    ├─ list       [$(basename "$0") -b list]                       lists the current backups and its location.
+    ├─ location   [$(basename "$0") -b location]                   Change location for backup.
+    ├─ clear      [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
+    ├─ run        [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
+    └─ bookmarks  [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
+" 
 
 usage_services="
     Options:      Syntax:                                          Description:
 
     -s            [$(basename "$0") -s]                            Shows this help message.
-    add           [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
-    list          [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
-    start         [$(basename "$0") -s start <service>]            Start the selected service.
-    stop          [$(basename "$0") -s stop <service>]             Stop the selected service.
-    enable        [$(basename "$0") -s enable <service>]           Enable the selected service.
-    disable       [$(basename "$0") -s disable <service>]          Disable the selected service.
-    status        [$(basename "$0") -s status <service>]           Show current service status.
-    clear         [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file
+    .
+    ├─ list       [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
+    ├─ clear      [$(basename "$0") -s clear]                      Clear the ~/.$(basename "$0")/service file  
+    ├─ add        [$(basename "$0") -s add <service>]              Add service managed by $(basename "$0") into the ~/$(basename "$0")/services file.
+    ├─ start      [$(basename "$0") -s start <service>]            Start the selected service.
+    ├─ stop       [$(basename "$0") -s stop <service>]             Stop the selected service
+    ├─ enable     [$(basename "$0") -s enable <service>]           Enable the selected service.
+    ├─ disable    [$(basename "$0") -s disable <service>]          Disable the selected service.
+    └─ status     [$(basename "$0") -s status <service>]           Show current service status.
 "
+
+usage_update="
+    Options:      Syntax:                                          Description:
+
+    -u            [$(basename "$0") -u]                            Update your system with default package manager. Debian=apt, Arch=pacman ...
+    .
+    └─── mgr      [$(basename "$0") -u mgr]                        Update this program with specific version, latest version or development version.
+         .
+         ├────────[$(basename "$0") -u mgr:1.0.0]                  Update to specific version of program
+         ├────────[$(basename "$0") -u mgr:dev]                    Update to dev version of program
+         ├────────[$(basename "$0") -u mgr ssh]                    Update the project to latest using ssh [default]
+         └────────[$(basename "$0") -u mgr https]                  Update the project to latest using Https
+    
+"
+
+usage_version="
+    Options:      Syntax:                                          Description:
+
+    -v            [$(basename "$0") -v]                            Get the current version of $(basename "$0")
+"
+
 # -- Functions -- #
 
 automatic_git () {
@@ -286,7 +305,7 @@ check_system () {
 update_system () {
   check_system
 
-  if [ -z $SYSTEM ]; then
+  if [[ -z $SYSTEM ]]; then
     echo "make sure /etc/os-release file or symbolic link exists"
   else
 
@@ -429,6 +448,11 @@ backup () {
   backup_bookmarks
 }
 
+list_backup () {
+  echo -e "${GREEN}Stuff to backup: ${WHITE}" && cat ~/.$(basename "$0")/backup_list
+  echo -e "${GREEN}Backup location: ${WHITE}" && cat ~/.$(basename "$0")/backup_location
+}
+
 control_service () {
   services_list=$(cat ~/.$(basename "$0")/services )
   LIST=$@
@@ -448,33 +472,61 @@ control_service () {
   done
 
   if [[ -z ${SERVICE} ]]; then
-    SERVICE=$services_list
+    SERVICE=${services_list}
   fi
 
-  for action in $LIST; do
-    case $action in
+  for action in ${LIST}; do
+    case ${action} in
       start)
-        sudo systemctl start $SERVICE
+        sudo systemctl start ${SERVICE}
         ;;
       stop)
-        sudo systemctl stop $SERVICE
+        sudo systemctl stop ${SERVICE}
         ;;
       enable)
-        sudo systemctl enable $SERVICE
+        sudo systemctl enable ${SERVICE}
         ;;
       disable)
-        sudo systemctl disable $SERVICE
+        sudo systemctl disable ${SERVICE}
         ;;
       status)
-        sudo systemctl status $SERVICE
+        sudo systemctl status ${SERVICE}
         ;;
     esac
   done
 }
 
+update_self() {
+  binary_path="/tmp/linux_manager"
+  arguements=$@
+  rm -rf /tmp/linux_manager
+  # Get version to update
+
+  if [[ $2 == *":"* ]]; then
+    version=$(cut -d: -f2 <<< ${2})
+  else
+    version="main"
+  fi
+
+  echo -e "${GREEN}Downloading mgr: ${version} ${WHITE}"
+
+  if [[ $3 == "https" ]]; then
+    project_url="https://github.com/grosheth/linux_manager.git"
+  else
+    project_url="git@github.com:grosheth/linux_manager.git"
+  fi
+
+  # Update project
+  git clone ${project_url} /tmp/linux_manager
+  git -C ${binary_path} fetch --all
+  git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
+  git describe --tags | cut -d- -f1
+  source ${binary_path}/installation.sh
+}
+
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
-currentdate=$(echo $(date '+%Y-%m-%d'))
+CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
 
 
 (( ! IMPL_MODE && ! NEST_LVL )) && {
@@ -487,7 +539,9 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
 
     # -- Execution -- #
     no_args="true"
-    if [ -z $OPTIND-1 ]; then echo "$form_top $usage"; fi
+    if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
+    
+    # This is all accepted parameters with a "-"
     while getopts ':-gpuvdsbh' option; do
       case "$option" in
         h)
@@ -509,7 +563,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 ;;
               repo)
                 if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git_repo"
+                  echo "$form_top $usage_git"
                 else
                   if [[ -z $4 ]]; then
                     private="true"
@@ -521,7 +575,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
                 ;;
               init)
                 if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git_init"
+                  echo "$form_top $usage_git"
                 else
                   if [[ -z $5 ]]; then
                     private="true"
@@ -555,7 +609,18 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         u)
-          update_system
+          if [[ -z $2 ]]; then
+            update_system
+          else
+            case $2 in
+              mgr*)
+                update_self $@
+                ;;
+              *)
+                echo "$form_top $usage_update"
+                ;;
+            esac
+          fi
           ;;
         d)
           if [[ -z $2 ]]; then
@@ -581,7 +646,15 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           fi
           ;;
         v)
-          get_version
+          if [[ -z $2 ]]; then
+            get_version
+          else
+            case $2 in
+              *)
+                echo "$form_top $usage_version"
+                ;;
+            esac
+          fi
           ;;
         s)
           if [[ -z $2 ]]; then
@@ -624,9 +697,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
           else
             case $2 in
               list)
-                ## Could make a clean output function for this ##
-                echo "Stuff to backup: " && cat ~/.$(basename "$0")/backup_list && echo "Backup location: " && cat ~/.$(basename "$0")/backup_location
-                ## Could make a clean output function for this ##
+                list_backup
                 ;;
               add)
                 add_to_list $@
@@ -655,7 +726,7 @@ currentdate=$(echo $(date '+%Y-%m-%d'))
     done
 
     exec $0 "$@"
-  ) | tee -a "${HOME}/.mgr/logs/log${currentdate}.out" 2>&1
+  ) | tee -a "${HOME}/.mgr/logs/log${CURRENTDATE}.out" 2>&1
   ) 1>&3 2>&4
 
   exit $?
