@@ -42,6 +42,7 @@ usage="
     -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
     -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
     -b            [$(basename "$0") -b]                            Create backups of selected files or folders
+    -f            [$(basename "$0") -f]                            Find a folder or content in files
 "
 
 usage_git="
@@ -549,7 +550,7 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
     if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
     
     # This is all accepted parameters with a "-"
-    while getopts ':-gpuvdsbh' option; do
+    while getopts ':-gpuvdsbhf' option; do
       case "$option" in
         h)
           if [[ -z $2 ]]; then
