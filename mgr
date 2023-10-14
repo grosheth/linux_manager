@@ -133,6 +133,14 @@ usage_version="
     -v            [$(basename "$0") -v]                            Get the current version of $(basename "$0")
 "
 
+usage_find="
+    Options:      Syntax:                                          Description:
+
+    -f            [$(basename "$0") -f]                            Shows this help message.
+    .
+    ├─ list       [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
+"
+
 # -- Functions -- #
 
 automatic_git () {
@@ -520,7 +528,6 @@ update_self() {
   git clone ${project_url} /tmp/linux_manager
   git -C ${binary_path} fetch --all
   git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
-  git describe --tags | cut -d- -f1
   source ${binary_path}/installation.sh
 }
 
