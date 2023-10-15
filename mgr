@@ -532,6 +532,16 @@ update_self() {
   source ${binary_path}/installation.sh
 }
 
+
+find_folder() {
+  pass
+}
+
+find_file_content() {
+  pass
+}
+
+
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
 CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
@@ -721,6 +731,17 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
                 ;;
               *)
                 echo "$form_top $usage_backup"
+                ;;
+            esac
+          fi
+          ;;
+        f)
+          if [[ -z $2 ]]; then
+            echo "$form_top $usage_find"
+          else
+            case $2 in
+              list)
+                cat ~/.$(basename "$0")/services
                 ;;
             esac
           fi
