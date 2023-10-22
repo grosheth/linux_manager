@@ -535,12 +535,15 @@ update_self() {
 
 find_folder() {
 
-  
+  # Find folders with specified name
   
   pass
 }
 
 find_file_content() {
+
+  # Find files with specified name
+  
   pass
 }
 
