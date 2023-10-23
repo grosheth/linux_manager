@@ -534,17 +534,33 @@ update_self() {
 
 
 find_folder() {
+  arguements=$@
+  folder_name=$2
 
-  # Find folders with specified name
-  
-  pass
+  echo "Searching for a folder named: ${folder_name}"
+  folder_search=$(find . -type f | grep ${folder_name})
+
 }
 
 find_file_content() {
 
-  # Find files with specified name
+  arguements=$@
+  folder_name=$2
+
+# Make it so it looks in every file instead
+
+  find_folder $@
   
-  pass
+  for x in ${folder_search}; do
+
+    if cat -n ${x} | grep -q $3; then
+      echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}$3"
+    fi
+
+  done
+
+
+
 }
 
 
@@ -746,8 +762,11 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
             echo "$form_top $usage_find"
           else
             case $2 in
-              list)
-                cat ~/.$(basename "$0")/services
+              file)
+                find_folder $@
+                ;;
+              *)
+                find_file_content $@
                 ;;
             esac
           fi
