@@ -42,6 +42,7 @@ usage="
     -d            [$(basename "$0") -d]                            Install dependencies from dependencies file. (sudo)
     -s            [$(basename "$0") -s]                            Manages some service on SystemD with $(basename "$0"). (sudo)
     -b            [$(basename "$0") -b]                            Create backups of selected files or folders
+    -f            [$(basename "$0") -f]                            Find a folder or content in files
 "
 
 usage_git="
@@ -131,6 +132,22 @@ usage_version="
     Options:      Syntax:                                          Description:
 
     -v            [$(basename "$0") -v]                            Get the current version of $(basename "$0")
+"
+
+usage_find="
+    Options:      Syntax:                                          Description:
+
+    -f            [$(basename "$0") -f]                            Shows this help message.
+    .
+    └─ string     [$(basename "$0") -f words in file]              Search in files from current repository and check if the string is there.
+"
+
+usage_find_folder="
+    Options:      Syntax:                                          Description:
+
+    -F            [$(basename "$0") -F]                            Shows this help message.
+    .
+    └─ folder     [$(basename "$0") -F folder]                     Search for repos with specified name.
 "
 
 # -- Functions -- #
@@ -520,9 +537,43 @@ update_self() {
   git clone ${project_url} /tmp/linux_manager
   git -C ${binary_path} fetch --all
   git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
-  git describe --tags | cut -d- -f1
   source ${binary_path}/installation.sh
 }
+
+
+find_folder() {
+  arguements=$@
+  folder_name=$2
+  path=$(pwd)
+
+  echo -e "Searching from ${YELLOW}${path}${WHITE} for a folder named: ${GREEN}${folder_name}"
+  find . -type f | grep ${folder_name}
+
+}
+
+find_file_content() {
+  arguements="${@:2}"
+
+  # Add all arguments into a string
+  for x in ${arguements}; do
+    string_to_search+=" ${x}"
+  done
+  echo ${string_to_search}
+
+  folder_search=$(find . -type f)
+  
+  for x in ${folder_search}; do
+
+    if cat -n ${x} | grep -q "${string_to_search}"; then
+      echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}${string_to_search}"
+    fi
+
+  done
+
+}
+
+
+# git test
 
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
@@ -542,7 +593,7 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
     if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
     
     # This is all accepted parameters with a "-"
-    while getopts ':-gpuvdsbh' option; do
+    while getopts ':-gpuvdsbhfF' option; do
       case "$option" in
         h)
           if [[ -z $2 ]]; then
@@ -713,6 +764,28 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
                 ;;
               *)
                 echo "$form_top $usage_backup"
+                ;;
+            esac
+          fi
+          ;;
+        f)
+          if [[ -z $2 ]]; then
+            echo "$form_top $usage_find"
+          else
+            case $2 in
+              *)
+                find_file_content $@
+                ;;
+            esac
+          fi
+          ;;
+        F)
+          if [[ -z $2 ]]; then
+            echo "$form_top $usage_find_folder"
+          else
+            case $2 in     
+              *)
+                find_folder $@
                 ;;
             esac
           fi

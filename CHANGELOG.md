@@ -1,6 +1,11 @@
-# 2.0.0
+# 2.1.0
 ### New Features
 
+- Find folders
+- Find string in folders files
+
+# 2.0.0
+### New Features
 
 ### Installation.sh
 
@@ -14,11 +19,6 @@
 - Added a list_backup function to list the backup locations
 - Added a command to install older versions or specific branches for mgr. (older versions might no be stable)
 
-
-
-TODO:
-- fix installation in /root
-- Let user use mgr
 
 ---
 
