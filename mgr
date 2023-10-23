@@ -139,7 +139,15 @@ usage_find="
 
     -f            [$(basename "$0") -f]                            Shows this help message.
     .
-    ├─ list       [$(basename "$0") -s list]                       lists the current services managed by $(basename "$0")
+    └─ string     [$(basename "$0") -f words in file]              Search in files from current repository and check if the string is there.
+"
+
+usage_find_folder="
+    Options:      Syntax:                                          Description:
+
+    -F            [$(basename "$0") -F]                            Shows this help message.
+    .
+    └─ folder     [$(basename "$0") -F folder]                     Search for repos with specified name.
 "
 
 # -- Functions -- #
@@ -773,7 +781,7 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
           ;;
         F)
           if [[ -z $2 ]]; then
-            echo "$form_top $usage_find"
+            echo "$form_top $usage_find_folder"
           else
             case $2 in     
               *)

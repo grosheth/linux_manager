@@ -1,8 +1,8 @@
-# 2.0.1
+# 2.1.0
 ### New Features
 
-- Scan folders 
-- Scan file contents
+- Find folders
+- Find string in folders files
 
 # 2.0.0
 ### New Features
