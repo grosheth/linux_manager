@@ -536,33 +536,36 @@ update_self() {
 find_folder() {
   arguements=$@
   folder_name=$2
+  path=$(pwd)
 
-  echo "Searching for a folder named: ${folder_name}"
-  folder_search=$(find . -type f | grep ${folder_name})
+  echo -e "Searching from ${YELLOW}${path}${WHITE} for a folder named: ${GREEN}${folder_name}"
+  find . -type f | grep ${folder_name}
 
 }
 
 find_file_content() {
+  arguements="${@:2}"
 
-  arguements=$@
-  folder_name=$2
+  # Add all arguments into a string
+  for x in ${arguements}; do
+    string_to_search+=" ${x}"
+  done
+  echo ${string_to_search}
 
-# Make it so it looks in every file instead
-
-  find_folder $@
+  folder_search=$(find . -type f)
   
   for x in ${folder_search}; do
 
-    if cat -n ${x} | grep -q $3; then
-      echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}$3"
+    if cat -n ${x} | grep -q "${string_to_search}"; then
+      echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}${string_to_search}"
     fi
 
   done
 
-
-
 }
 
+
+# git test
 
 # -- Logging -- #
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
@@ -582,7 +585,7 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
     if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
     
     # This is all accepted parameters with a "-"
-    while getopts ':-gpuvdsbhf' option; do
+    while getopts ':-gpuvdsbhfF' option; do
       case "$option" in
         h)
           if [[ -z $2 ]]; then
@@ -762,11 +765,19 @@ CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
             echo "$form_top $usage_find"
           else
             case $2 in
-              file)
-                find_folder $@
-                ;;
               *)
                 find_file_content $@
+                ;;
+            esac
+          fi
+          ;;
+        F)
+          if [[ -z $2 ]]; then
+            echo "$form_top $usage_find"
+          else
+            case $2 in     
+              *)
+                find_folder $@
                 ;;
             esac
           fi
