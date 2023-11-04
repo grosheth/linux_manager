@@ -4,7 +4,6 @@
 - Find folders
 - Find string in folders files
 
-
 # 2.0.0
 ### New Features
 
