@@ -159,6 +159,7 @@ automatic_git () {
   }
   CMD_RETURN_CODE=$?
   STRING=$@
+  branch=$(git rev-parse --abbrev-ref HEAD)
   
   echo -e "${YELLOW} --- Push changes to git repo ---"
     if [ $CMD_RETURN_CODE != 0 ]; then
@@ -166,7 +167,7 @@ automatic_git () {
         exit 1
     else
       echo -e "${GREEN}Success ${WHITE}"
-      git add . && git commit -m "${STRING}" && git push
+      git add --all . && git commit -m "${STRING}" && git push --set-upstream origin ${branch}
     fi
 }
 
