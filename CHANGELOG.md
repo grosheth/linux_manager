@@ -1,3 +1,8 @@
+# 2.2.0
+### New Features
+
+- Automatic git commands can now push into new branches
+
 # 2.1.0
 ### New Features
 
