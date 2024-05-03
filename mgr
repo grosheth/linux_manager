@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # -- Version -- #
-get_version () {
-  {
-      VERSION=$(cat ~/.mgr/VERSION)
-  }
-  CMD_RETURN_CODE=$?
+get_version() {
+	{
+		VERSION=$(cat ~/.mgr/VERSION)
+	}
+	CMD_RETURN_CODE=$?
 
-  if [ -z ${VERSION} ]; then
-    VERSION="0.0.0"
-  fi
-  echo $VERSION
+	if [ -z ${VERSION} ]; then
+		VERSION="0.0.0"
+	fi
+	echo $VERSION
 }
 VERSION=$(cat ~/.mgr/VERSION)
 
@@ -97,7 +97,7 @@ usage_backup="
     ├─ clear      [$(basename "$0") -b clear]                      Clear the ~/.$(basename "$0")/backup file
     ├─ run        [$(basename "$0") -b run]                        Creates backups of files and folder located in ~/.$(basename "$0")/backup_list
     └─ bookmarks  [$(basename "$0") -b bookmarks]                  Export browser bookmarks and save them into backup folder 
-" 
+"
 
 usage_services="
     Options:      Syntax:                                          Description:
@@ -125,7 +125,7 @@ usage_update="
          ├────────[$(basename "$0") -u mgr:dev]                    Update to dev version of program
          ├────────[$(basename "$0") -u mgr ssh]                    Update the project to latest using ssh [default]
          └────────[$(basename "$0") -u mgr https]                  Update the project to latest using Https
-    
+   s 
 "
 
 usage_version="
@@ -152,427 +152,424 @@ usage_find_folder="
 
 # -- Functions -- #
 
-automatic_git () {
-  # Could be more complete, better error catching
-  {
-      COMMAND=$(git add .)
-  }
-  CMD_RETURN_CODE=$?
-  STRING=$@
-  branch=$(git rev-parse --abbrev-ref HEAD)
-  
-  echo -e "${YELLOW} --- Push changes to git repo ---"
-    if [ $CMD_RETURN_CODE != 0 ]; then
-        echo -e "${RED}Failed"
-        exit 1
-    else
-      echo -e "${GREEN}Success ${WHITE}"
-      git add --all . && git commit -m "${STRING}" && git push --set-upstream origin ${branch}
-    fi
+automatic_git() {
+	# Could be more complete, better error catching
+	{
+		COMMAND=$(git add .)
+	}
+	CMD_RETURN_CODE=$?
+	STRING=$@
+	branch=$(git rev-parse --abbrev-ref HEAD)
+
+	echo -e "${YELLOW} --- Push changes to git repo ---"
+	if [ $CMD_RETURN_CODE != 0 ]; then
+		echo -e "${RED}Failed"
+		exit 1
+	else
+		echo -e "${GREEN}Success ${WHITE}"
+		git add --all . && git commit -m "${STRING}" && git push --set-upstream origin ${branch}
+	fi
 }
 
-check_tag () {
-  tag_list=$(git tag)
-  for tag in $tag_list
-  do
-    if [[ ${tag} == ${VERSION} ]];then
-      echo -e "${GREEN}The tag ${VERSION} is created "
-      exit 0
-    else
-      echo -e "${RED}The tag ${VERSION} is not created "
-      exit 1
-    fi
-  done
+check_tag() {
+	tag_list=$(git tag)
+	for tag in $tag_list; do
+		if [[ ${tag} == ${VERSION} ]]; then
+			echo -e "${GREEN}The tag ${VERSION} is created "
+			exit 0
+		else
+			echo -e "${RED}The tag ${VERSION} is not created "
+			exit 1
+		fi
+	done
 }
 
-git_bump_patch () {
-  patch="${VERSION#*.}"
-  patch="${patch#*.}"
-  
-  if [ $patch == 9 ]; then
-    git_bump_minor
-  else
-    patch=$((patch+1))
-    VERSION=${VERSION%?}$patch
-  fi
+git_bump_patch() {
+	patch="${VERSION#*.}"
+	patch="${patch#*.}"
+
+	if [ $patch == 9 ]; then
+		git_bump_minor
+	else
+		patch=$((patch + 1))
+		VERSION=${VERSION%?}$patch
+	fi
 }
 
-git_bump_minor () {
-  patch=0
-  minor="${VERSION#*.}"
-  minor="${minor:0:1}"
-  major="${VERSION%.*}"
-  major="${major%.*}"
+git_bump_minor() {
+	patch=0
+	minor="${VERSION#*.}"
+	minor="${minor:0:1}"
+	major="${VERSION%.*}"
+	major="${major%.*}"
 
-  if [ $minor == 9 ]; then
-    git_bump_major
-  else
-    minor=$((minor+1))
-    VERSION=$major.$minor.$patch
-  fi
+	if [ $minor == 9 ]; then
+		git_bump_major
+	else
+		minor=$((minor + 1))
+		VERSION=$major.$minor.$patch
+	fi
 }
 
-git_bump_major () {
-  patch=0
-  minor=0
-  major="${VERSION%.*}"
-  major="${major%.*}"
-  major=$((major+1))
-  VERSION=$major.$minor.$patch
+git_bump_major() {
+	patch=0
+	minor=0
+	major="${VERSION%.*}"
+	major="${major%.*}"
+	major=$((major + 1))
+	VERSION=$major.$minor.$patch
 }
 
 # Make this feature universal, currently only works with this repo
-git_tag () {
-  {
-      COMMAND=$(git add .)
-  }
-  CMD_RETURN_CODE=$?
+git_tag() {
+	{
+		COMMAND=$(git add .)
+	}
+	CMD_RETURN_CODE=$?
 
-  if [ ${CMD_RETURN_CODE} == 0 ]; then
+	if [ ${CMD_RETURN_CODE} == 0 ]; then
 
-    # $LIST variable is created before calling this function
-    for bump in $LIST; do
-      case "$bump" in
-        patch)
-          git_bump_patch
-          ;;
-        minor)
-          git_bump_minor
-          ;;
-        major)
-          git_bump_major
-          ;;
-      esac
-    done
-    
-    git tag $VERSION HEAD
-    git push origin $VERSION
-    echo $VERSION > ~/.$(basename "$0")/VERSION
+		# $LIST variable is created before calling this function
+		for bump in $LIST; do
+			case "$bump" in
+			patch)
+				git_bump_patch
+				;;
+			minor)
+				git_bump_minor
+				;;
+			major)
+				git_bump_major
+				;;
+			esac
+		done
 
-  else
-    echo -e "${RED}You must be in the mgr git folder to upgrade this projects version"
-    exit 1
-  fi
+		git tag $VERSION HEAD
+		git push origin $VERSION
+		echo $VERSION >~/.$(basename "$0")/VERSION
+
+	else
+		echo -e "${RED}You must be in the mgr git folder to upgrade this projects version"
+		exit 1
+	fi
 }
 
-setup_python_venv () {
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install --upgrade pip
-  if [ -f requirements.txt ]; then
-    pip install -r requirements.txt
-  else
-    touch requirements.txt
-  fi
-  code .
+setup_python_venv() {
+	python3 -m venv .venv
+	source .venv/bin/activate
+	pip install --upgrade pip
+	if [ -f requirements.txt ]; then
+		pip install -r requirements.txt
+	else
+		touch requirements.txt
+	fi
+	code .
 }
 
-setup_python_project () {
-  PROJECT_NAME=$1
-  mkdir $PROJECT_NAME
-  cd $PROJECT_NAME
-  setup_python_venv
+setup_python_project() {
+	PROJECT_NAME=$1
+	mkdir $PROJECT_NAME
+	cd $PROJECT_NAME
+	setup_python_venv
 }
 
-add_github_token () {
-  read -p "Set your Github Token: " github_token
-  echo $github_token > ~/.mgr/token
+add_github_token() {
+	read -p "Set your Github Token: " github_token
+	echo $github_token >~/.mgr/token
 }
 
-create_github_repo () {
-  if [ ! -f ~/.$(basename "$0")/token ]; then
-    add_github_token
-  fi
-  TOKEN=$(cat ~/.$(basename "$0")/token)
-  curl \
-    -X POST \
-    -H "Accept: application/vnd.github+json" \
-    -H "Authorization: token $TOKEN" \
-    -d '{"name":"'$1'","private":"'$2'", "homepage":"https://github.com"}' \
-    https://api.github.com/user/repos
+create_github_repo() {
+	if [ ! -f ~/.$(basename "$0")/token ]; then
+		add_github_token
+	fi
+	TOKEN=$(cat ~/.$(basename "$0")/token)
+	curl \
+		-X POST \
+		-H "Accept: application/vnd.github+json" \
+		-H "Authorization: token $TOKEN" \
+		-d '{"name":"'$1'","private":"'$2'", "homepage":"https://github.com"}' \
+		https://api.github.com/user/repos
 }
 
-github_init () {
+github_init() {
 
-  [ -f ~/.$(basename "$0")/token ] || add_github_token
-  TOKEN=$(cat ~/.mgr/token)
-  COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
+	[ -f ~/.$(basename "$0")/token ] || add_github_token
+	TOKEN=$(cat ~/.mgr/token)
+	COMMAND=$(curl -X GET -H "Authorization: token $TOKEN" https://api.github.com/repos/$1/$2 | grep "Not Found")
 
-  if [ ! -z "$COMMAND" ]; then
-    create_github_repo $2 $3
-  fi
+	if [ ! -z "$COMMAND" ]; then
+		create_github_repo $2 $3
+	fi
 
-  git init
-  git remote add $2 git@github.com:$1/$2.git
+	git init
+	git remote add $2 git@github.com:$1/$2.git
 }
 
-check_system () {
-  {
-      COMMAND=$(cat /etc/os-release)
-  }
-  CMD_RETURN_CODE=$?
+check_system() {
+	{
+		COMMAND=$(cat /etc/os-release)
+	}
+	CMD_RETURN_CODE=$?
 
-  if [ $CMD_RETURN_CODE != 0 ]; then
-    echo -e "${RED}No os-release file was found on the server"
-    exit 1
-  else
-    SYSTEM=$(cat /etc/os-release)
-  fi
+	if [ $CMD_RETURN_CODE != 0 ]; then
+		echo -e "${RED}No os-release file was found on the server"
+		exit 1
+	else
+		SYSTEM=$(cat /etc/os-release)
+	fi
 }
 
-update_system () {
-  check_system
+update_system() {
+	check_system
 
-  if [[ -z $SYSTEM ]]; then
-    echo "make sure /etc/os-release file or symbolic link exists"
-  else
+	if [[ -z $SYSTEM ]]; then
+		echo "make sure /etc/os-release file or symbolic link exists"
+	else
 
-    if [[ $SYSTEM == *"arch"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
-      sleep 0.1
-      sudo pacman -Syu --noconfirm
-    fi
+		if [[ $SYSTEM == *"arch"* ]]; then
+			echo -e "${GREEN}According to os-release, your system is Arch based \n$SYSTEM ${WHITE}"
+			sleep 0.1
+			sudo pacman -Syu --noconfirm
+		fi
 
-    if [[ $SYSTEM == *"debian"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
-      sleep 0.1
-      sudo apt-get update && sudo apt-get upgrade -y
-    fi
+		if [[ $SYSTEM == *"debian"* ]]; then
+			echo -e "${GREEN}According to os-release, your system is Debian based \n$SYSTEM ${WHITE}"
+			sleep 0.1
+			sudo apt-get update && sudo apt-get upgrade -y
+		fi
 
-    if [[ $SYSTEM == *"fedora"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
-      sleep 0.1
-      sudo dnf upgrade -y
-    fi
+		if [[ $SYSTEM == *"fedora"* ]]; then
+			echo -e "${GREEN}According to os-release, your system is Fedora \n$SYSTEM ${WHITE}"
+			sleep 0.1
+			sudo dnf upgrade -y
+		fi
 
-  fi
+	fi
 }
 
-add_to_list () {
-  LIST=$@
+add_to_list() {
+	LIST=$@
 
-  for package in $LIST; do
-    case "$package" in
-      -d)
-        file="dependencies"
-        ;;
-      -s)
-        file="services"
-        ;;
-      -b)
-        file="backup_list"
-        ;;
-    esac
+	for package in $LIST; do
+		case "$package" in
+		-d)
+			file="dependencies"
+			;;
+		-s)
+			file="services"
+			;;
+		-b)
+			file="backup_list"
+			;;
+		esac
 
-    if [[ ${package} != *'-'* && ${package} != 'add' ]]; then
-      echo -e ${package} >> $HOME/.$(basename "$0")/${file}
-    fi
-  done
+		if [[ ${package} != *'-'* && ${package} != 'add' ]]; then
+			echo -e ${package} >>$HOME/.$(basename "$0")/${file}
+		fi
+	done
 }
 
-install_dependencies () {
-  check_system
+install_dependencies() {
+	check_system
 
-    PACKAGE_LIST=$(cat $HOME/.$(basename "$0")/dependencies)
+	PACKAGE_LIST=$(cat $HOME/.$(basename "$0")/dependencies)
 
-    if [[ $SYSTEM == *"arch"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Arch based \n ${WHITE}"
-      
-      for package in $PACKAGE_LIST; do
-        echo -e "${GREEN}Installing ${package} ${WHITE}"
-        sudo pacman -S ${package} --noconfirm
-      done
-    fi
+	if [[ $SYSTEM == *"arch"* ]]; then
+		echo -e "${GREEN}According to os-release, your system is Arch based \n ${WHITE}"
 
-    if [[ $SYSTEM == *"debian"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Debian based \n${WHITE}"
-      for package in $PACKAGE_LIST; do
-        echo -e "${GREEN}Installing ${package} ${WHITE}"
-        sudo apt-get install ${package}  -y
-      done
-    fi
+		for package in $PACKAGE_LIST; do
+			echo -e "${GREEN}Installing ${package} ${WHITE}"
+			sudo pacman -S ${package} --noconfirm
+		done
+	fi
 
-    if [[ $SYSTEM == *"fedora"* ]]; then
-      echo -e "${GREEN}According to os-release, your system is Fedora \n ${WHITE}"
-      for package in $PACKAGE_LIST; do
-        echo -e "${GREEN}Installing ${package} ${WHITE}"
-        sudo dnf install ${package} -y
-      done
-    fi
+	if [[ $SYSTEM == *"debian"* ]]; then
+		echo -e "${GREEN}According to os-release, your system is Debian based \n${WHITE}"
+		for package in $PACKAGE_LIST; do
+			echo -e "${GREEN}Installing ${package} ${WHITE}"
+			sudo apt-get install ${package} -y
+		done
+	fi
+
+	if [[ $SYSTEM == *"fedora"* ]]; then
+		echo -e "${GREEN}According to os-release, your system is Fedora \n ${WHITE}"
+		for package in $PACKAGE_LIST; do
+			echo -e "${GREEN}Installing ${package} ${WHITE}"
+			sudo dnf install ${package} -y
+		done
+	fi
 }
 
 backup_location() {
-  echo "Please enter full path for backup location"
-  read -p "Enter location for backup:" backup_location
+	echo "Please enter full path for backup location"
+	read -p "Enter location for backup:" backup_location
 
-  {
-    COMMAND=$(stat ${backup_location})
-  }
-  CMD_RETURN_CODE=$?
+	{
+		COMMAND=$(stat ${backup_location})
+	}
+	CMD_RETURN_CODE=$?
 
-  if [ $CMD_RETURN_CODE == 0 ]; then
-    >  ~/.$(basename "$0")/backup_location
-    echo ${backup_location} >  ~/.$(basename "$0")/backup_location
-  else
-    echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
-    exit 1
-  fi
+	if [ $CMD_RETURN_CODE == 0 ]; then
+		>~/.$(basename "$0")/backup_location
+		echo ${backup_location} >~/.$(basename "$0")/backup_location
+	else
+		echo -e "${RED}< ${backup_location} > does not exists or user does not have required permissions"
+		exit 1
+	fi
 }
 
-backup_bookmarks () {
-  bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
+backup_bookmarks() {
+	bookmarks_location="${HOME}/.config/BraveSoftware/Brave-Browser/Default/Bookmarks"
 
-  {
-    COMMAND=$(cat ${bookmarks_location})
-  }
-  CMD_RETURN_CODE=$?
-  
-  if [ $CMD_RETURN_CODE == 0 ]; then
-    echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_folder}"
-    cp -R $bookmarks_location ${backup_folder}/Brave_bookmarks
-  else
-    echo -e "${RED}No Bookmarks exists for Brave"
-  fi
+	{
+		COMMAND=$(cat ${bookmarks_location})
+	}
+	CMD_RETURN_CODE=$?
+
+	if [ $CMD_RETURN_CODE == 0 ]; then
+		echo -e "${GREEN}Backup of Bookmarks will be created in ${backup_folder}"
+		cp -R $bookmarks_location ${backup_folder}/Brave_bookmarks
+	else
+		echo -e "${RED}No Bookmarks exists for Brave"
+	fi
 }
 
-backup () {
-  backup_list=$(cat ~/.$(basename "$0")/backup_list )
-  backup_location=$(cat ~/.$(basename "$0")/backup_location )
+backup() {
+	backup_list=$(cat ~/.$(basename "$0")/backup_list)
+	backup_location=$(cat ~/.$(basename "$0")/backup_location)
 
-  if [ -z ${backup_location} ]; then
-    backup_location
-  fi
+	if [ -z ${backup_location} ]; then
+		backup_location
+	fi
 
-  current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
-  mkdir ${backup_location}/${current_date}
-  backup_folder="${backup_location}/${current_date}"
+	current_date=$(echo $(date '+%Y-%m-%d-%H:%M:%S'))
+	mkdir ${backup_location}/${current_date}
+	backup_folder="${backup_location}/${current_date}"
 
-  for item in ${backup_list}; do
-    {
-      COMMAND=$(stat ${item})
-    }
-    CMD_RETURN_CODE=$?
+	for item in ${backup_list}; do
+		{
+			COMMAND=$(stat ${item})
+		}
+		CMD_RETURN_CODE=$?
 
-    if [ $CMD_RETURN_CODE == 0 ]; then
-      infos="$(stat ${item})"
-    else
-      echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
-    fi
+		if [ $CMD_RETURN_CODE == 0 ]; then
+			infos="$(stat ${item})"
+		else
+			echo -e "${RED}< ${item} > does not exists or user does not have required permissions"
+		fi
 
-    echo -e "${GREEN}Backup of ${item} will be created in ${backup_folder}"
-    cp -R ${item} ${backup_folder}
+		echo -e "${GREEN}Backup of ${item} will be created in ${backup_folder}"
+		cp -R ${item} ${backup_folder}
 
-  done
-  backup_bookmarks
+	done
+	backup_bookmarks
 }
 
-list_backup () {
-  echo -e "${GREEN}Stuff to backup: ${WHITE}" && cat ~/.$(basename "$0")/backup_list
-  echo -e "${GREEN}Backup location: ${WHITE}" && cat ~/.$(basename "$0")/backup_location
+list_backup() {
+	echo -e "${GREEN}Stuff to backup: ${WHITE}" && cat ~/.$(basename "$0")/backup_list
+	echo -e "${GREEN}Backup location: ${WHITE}" && cat ~/.$(basename "$0")/backup_location
 }
 
-control_service () {
-  services_list=$(cat ~/.$(basename "$0")/services )
-  LIST=$@
+control_service() {
+	services_list=$(cat ~/.$(basename "$0")/services)
+	LIST=$@
 
-  #Check if one service is specified, if not apply to all services
-  if [[ -z ${services_list} ]]; then
-    echo -e "${RED}Aucun services n'est gerer par $(basename "$0"), use this command to add one: $(basename "$0") -s add servicename "
-    exit 1
-  fi
+	#Check if one service is specified, if not apply to all services
+	if [[ -z ${services_list} ]]; then
+		echo -e "${RED}Aucun services n'est gerer par $(basename "$0"), use this command to add one: $(basename "$0") -s add servicename "
+		exit 1
+	fi
 
-  for service in $LIST; do
-    for managed_service in $services_list; do
-      if [ ${service} == ${managed_service} ]; then
-        SERVICE=$service
-      fi
-    done
-  done
+	for service in $LIST; do
+		for managed_service in $services_list; do
+			if [ ${service} == ${managed_service} ]; then
+				SERVICE=$service
+			fi
+		done
+	done
 
-  if [[ -z ${SERVICE} ]]; then
-    SERVICE=${services_list}
-  fi
+	if [[ -z ${SERVICE} ]]; then
+		SERVICE=${services_list}
+	fi
 
-  for action in ${LIST}; do
-    case ${action} in
-      start)
-        sudo systemctl start ${SERVICE}
-        ;;
-      stop)
-        sudo systemctl stop ${SERVICE}
-        ;;
-      enable)
-        sudo systemctl enable ${SERVICE}
-        ;;
-      disable)
-        sudo systemctl disable ${SERVICE}
-        ;;
-      status)
-        sudo systemctl status ${SERVICE}
-        ;;
-    esac
-  done
+	for action in ${LIST}; do
+		case ${action} in
+		start)
+			sudo systemctl start ${SERVICE}
+			;;
+		stop)
+			sudo systemctl stop ${SERVICE}
+			;;
+		enable)
+			sudo systemctl enable ${SERVICE}
+			;;
+		disable)
+			sudo systemctl disable ${SERVICE}
+			;;
+		status)
+			sudo systemctl status ${SERVICE}
+			;;
+		esac
+	done
 }
 
 update_self() {
-  binary_path="/tmp/linux_manager"
-  arguements=$@
-  rm -rf /tmp/linux_manager
-  # Get version to update
+	binary_path="/tmp/linux_manager"
+	arguements=$@
+	rm -rf /tmp/linux_manager
+	# Get version to update
 
-  if [[ $2 == *":"* ]]; then
-    version=$(cut -d: -f2 <<< ${2})
-  else
-    version="main"
-  fi
+	if [[ $2 == *":"* ]]; then
+		version=$(cut -d: -f2 <<<${2})
+	else
+		version="main"
+	fi
 
-  echo -e "${GREEN}Downloading mgr: ${version} ${WHITE}"
+	echo -e "${GREEN}Downloading mgr: ${version} ${WHITE}"
 
-  if [[ $3 == "https" ]]; then
-    project_url="https://github.com/grosheth/linux_manager.git"
-  else
-    project_url="git@github.com:grosheth/linux_manager.git"
-  fi
+	if [[ $3 == "https" ]]; then
+		project_url="https://github.com/grosheth/linux_manager.git"
+	else
+		project_url="git@github.com:grosheth/linux_manager.git"
+	fi
 
-  # Update project
-  git clone ${project_url} /tmp/linux_manager
-  git -C ${binary_path} fetch --all
-  git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
-  source ${binary_path}/installation.sh
+	# Update project
+	git clone ${project_url} /tmp/linux_manager
+	git -C ${binary_path} fetch --all
+	git -C ${binary_path} checkout ${version} && git -C ${binary_path} branch
+	source ${binary_path}/installation.sh
 }
 
-
 find_folder() {
-  arguements=$@
-  folder_name=$2
-  path=$(pwd)
+	arguements=$@
+	folder_name=$2
+	path=$(pwd)
 
-  echo -e "Searching from ${YELLOW}${path}${WHITE} for a folder named: ${GREEN}${folder_name}"
-  find . -type f | grep ${folder_name}
+	echo -e "Searching from ${YELLOW}${path}${WHITE} for a folder named: ${GREEN}${folder_name}"
+	find . -type f | grep ${folder_name}
 
 }
 
 find_file_content() {
-  arguements="${@:2}"
+	arguements="${@:2}"
 
-  # Add all arguments into a string
-  for x in ${arguements}; do
-    string_to_search+=" ${x}"
-  done
-  echo ${string_to_search}
+	# Add all arguments into a string
+	for x in ${arguements}; do
+		string_to_search+=" ${x}"
+	done
+	echo ${string_to_search}
 
-  folder_search=$(find . -type f)
-  
-  for x in ${folder_search}; do
+	folder_search=$(find . -type f)
 
-    if cat -n ${x} | grep -q "${string_to_search}"; then
-      echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}${string_to_search}"
-    fi
+	for x in ${folder_search}; do
 
-  done
+		if cat -n ${x} | grep -q "${string_to_search}"; then
+			echo -e "${WHITE}The file ${YELLOW}${x}${WHITE} contains the string ${GREEN}${string_to_search}"
+		fi
+
+	done
 
 }
-
 
 # git test
 
@@ -580,237 +577,239 @@ find_file_content() {
 SCRIPTS_LOGS_ROOT="$HOME/.mgr/logs/"
 CURRENTDATE=$(echo $(date '+%Y-%m-%d'))
 
+((!IMPL_MODE && !NEST_LVL)) && {
+	export IMPL_MODE=1
+	exec 3>&1 4>&2
+	trap 'exec 2>&4 1>&3' EXIT HUP INT QUIT RETURN
 
-(( ! IMPL_MODE && ! NEST_LVL )) && {
-  export IMPL_MODE=1
-  exec 3>&1 4>&2
-  trap 'exec 2>&4 1>&3' EXIT HUP INT QUIT RETURN
+	(
+		(
 
-  (
-  (
+			# -- Execution -- #
+			no_args="true"
+			if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
 
-    # -- Execution -- #
-    no_args="true"
-    if [ -z $OPTIND-1 ]; then echo "${form_top} ${usage}"; fi
-    
-    # This is all accepted parameters with a "-"
-    while getopts ':-gpuvdsbhfF' option; do
-      case "$option" in
-        h)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage"
-          fi
-          ;;
-        g)
-          LIST=$@
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_git"
-          else
-            case $2 in
-              token)
-                add_github_token
-                ;;
-              tag)
-                git_tag
-                ;;
-              repo)
-                if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git"
-                else
-                  if [[ -z $4 ]]; then
-                    private="true"
-                  else
-                    private=$4
-                  fi
-                  create_github_repo $3 private
-                fi
-                ;;
-              init)
-                if [[ -z $3 ]]; then
-                  echo "$form_top $usage_git"
-                else
-                  if [[ -z $5 ]]; then
-                    private="true"
-                  else
-                    private=$5
-                  fi
-                    github_init $3 $4 private
-                fi
-                ;;
-              tag_check)
-                check_tag
-                ;;
-              *)
-                automatic_git $2
-                ;;
-            esac
-          fi
-          ;;
-        p)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_python_venv"
-          else
-            case $2 in
-              venv)
-                setup_python_venv
-                ;;
-              *)
-                setup_python_project $2
-                ;;
-            esac
-          fi
-          ;;
-        u)
-          if [[ -z $2 ]]; then
-            update_system
-          else
-            case $2 in
-              mgr*)
-                update_self $@
-                ;;
-              *)
-                echo "$form_top $usage_update"
-                ;;
-            esac
-          fi
-          ;;
-        d)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_install_dependencies"
-          else
-            case $2 in
-              list)
-                cat ~/.$(basename "$0")/dependencies
-                ;;
-              add)
-                add_to_list $@
-                ;;
-              clear)
-                >  ~/.$(basename "$0")/dependencies
-                ;;
-              install)
-                install_dependencies
-                ;;
-              *)
-                echo "$form_top $usage_install_dependencies"
-                ;;
-            esac
-          fi
-          ;;
-        v)
-          if [[ -z $2 ]]; then
-            get_version
-          else
-            case $2 in
-              *)
-                echo "$form_top $usage_version"
-                ;;
-            esac
-          fi
-          ;;
-        s)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_services"
-          else
-            case $2 in
-              list)
-                cat ~/.$(basename "$0")/services
-                ;;
-              add)
-                add_to_list $@
-                ;;
-              clear)
-                >  ~/.$(basename "$0")/services
-                ;;
-              start)
-                control_service $@
-                ;;
-              stop)
-                control_service $@
-                ;;
-              enable)
-                control_service $@
-                ;;
-              disable)
-                control_service $@
-                ;;
-              status)
-                control_service $@
-                ;;
-              *)
-                echo "$form_top $usage_services"
-                ;;
-            esac
-          fi
-          ;;
-        b)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_backup"
-          else
-            case $2 in
-              list)
-                list_backup
-                ;;
-              add)
-                add_to_list $@
-                ;;
-              clear)
-                >  ~/.$(basename "$0")/backup_list
-                ;;
-              location)
-                backup_location
-                ;;
-              run)
-                backup
-                ;;
-              *)
-                echo "$form_top $usage_backup"
-                ;;
-            esac
-          fi
-          ;;
-        f)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_find"
-          else
-            case $2 in
-              *)
-                find_file_content $@
-                ;;
-            esac
-          fi
-          ;;
-        F)
-          if [[ -z $2 ]]; then
-            echo "$form_top $usage_find_folder"
-          else
-            case $2 in     
-              *)
-                find_folder $@
-                ;;
-            esac
-          fi
-          ;;
-      \?) echo "illegal option:" "$OPTARG" >&2
-          echo "$form_top $usage" >&2
-          exit 1
-          ;;
-      esac
-      no_args="false"
-    done
+			# This is all accepted parameters with a "-"
+			while getopts ':-gpuvdsbhfF' option; do
+				case "$option" in
+				h)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage"
+					fi
+					;;
+				g)
+					LIST=$@
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_git"
+					else
+						case $2 in
+						token)
+							add_github_token
+							;;
+						tag)
+							git_tag
+							;;
+						repo)
+							if [[ -z $3 ]]; then
+								echo "$form_top $usage_git"
+							else
+								if [[ -z $4 ]]; then
+									private="true"
+								else
+									private=$4
+								fi
+								create_github_repo $3 private
+							fi
+							;;
+						init)
+							if [[ -z $3 ]]; then
+								echo "$form_top $usage_git"
+							else
+								if [[ -z $5 ]]; then
+									private="true"
+								else
+									private=$5
+								fi
+								github_init $3 $4 private
+							fi
+							;;
+						tag_check)
+							check_tag
+							;;
+						*)
+							automatic_git $2
+							;;
+						esac
+					fi
+					;;
+				p)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_python_venv"
+					else
+						case $2 in
+						venv)
+							setup_python_venv
+							;;
+						*)
+							setup_python_project $2
+							;;
+						esac
+					fi
+					;;
+				u)
+					if [[ -z $2 ]]; then
+						update_system
+					else
+						case $2 in
+						mgr*)
+							update_self $@
+							;;
+						*)
+							echo "$form_top $usage_update"
+							;;
+						esac
+					fi
+					;;
+				d)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_install_dependencies"
+					else
+						case $2 in
+						list)
+							cat ~/.$(basename "$0")/dependencies
+							;;
+						add)
+							add_to_list $@
+							;;
+						clear)
+							>~/.$(basename "$0")/dependencies
+							;;
+						install)
+							install_dependencies
+							;;
+						*)
+							echo "$form_top $usage_install_dependencies"
+							;;
+						esac
+					fi
+					;;
+				v)
+					if [[ -z $2 ]]; then
+						get_version
+					else
+						case $2 in
+						*)
+							echo "$form_top $usage_version"
+							;;
+						esac
+					fi
+					;;
+				s)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_services"
+					else
+						case $2 in
+						list)
+							cat ~/.$(basename "$0")/services
+							;;
+						add)
+							add_to_list $@
+							;;
+						clear)
+							>~/.$(basename "$0")/services
+							;;
+						start)
+							control_service $@
+							;;
+						stop)
+							control_service $@
+							;;
+						enable)
+							control_service $@
+							;;
+						disable)
+							control_service $@
+							;;
+						status)
+							control_service $@
+							;;
+						*)
+							echo "$form_top $usage_services"
+							;;
+						esac
+					fi
+					;;
+				b)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_backup"
+					else
+						case $2 in
+						list)
+							list_backup
+							;;
+						add)
+							add_to_list $@
+							;;
+						clear)
+							>~/.$(basename "$0")/backup_list
+							;;
+						location)
+							backup_location
+							;;
+						run)
+							backup
+							;;
+						*)
+							echo "$form_top $usage_backup"
+							;;
+						esac
+					fi
+					;;
+				f)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_find"
+					else
+						case $2 in
+						*)
+							find_file_content $@
+							;;
+						esac
+					fi
+					;;
+				F)
+					if [[ -z $2 ]]; then
+						echo "$form_top $usage_find_folder"
+					else
+						case $2 in
+						*)
+							find_folder $@
+							;;
+						esac
+					fi
+					;;
+				\?)
+					echo "illegal option:" "$OPTARG" >&2
+					echo "$form_top $usage" >&2
+					exit 1
+					;;
+				esac
+				no_args="false"
+			done
 
-    exec $0 "$@"
-  ) | tee -a "${HOME}/.mgr/logs/log${CURRENTDATE}.out" 2>&1
-  ) 1>&3 2>&4
+			exec $0 "$@"
+		) | tee -a "${HOME}/.mgr/logs/log${CURRENTDATE}.out" 2>&1
+	) 1>&3 2>&4
 
-  exit $?
+	exit $?
 }
 
-(( NEST_LVL++ ))
-
+((NEST_LVL++))
 
 [ -d ~/.$(basename "$0") ] || mkdir ~/.$(basename "$0")
-[[ "$no_args" == "true" ]] && { echo "$form_top $usage"; exit 1; }
-shift "$(($OPTIND-1))"
+[[ "$no_args" == "true" ]] && {
+	echo "$form_top $usage"
+	exit 1
+}
+shift "$(($OPTIND - 1))"
 
 exit 0
